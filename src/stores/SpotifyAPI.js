@@ -28,7 +28,17 @@ export const useSpotifyStore = defineStore('spotify', {
             return url;
         },
         async setToken(token){
+            /*const expiration = new Date();
+            expiration.setMinutes(expiration.getMinutes() + (token.expires_in/60));
+            console.log(expiration)
+            token.expiration = expiration;*/
+
+            const expiration_date = new Date();
+            expiration_date.setMinutes(expiration_date.getMinutes() + (Math.floor(token.expires_in/960)));
+            token.valid_until = expiration_date;
             this.token = token;
+
+            
             axios.defaults.headers.common = {'Authorization': `Bearer ${this.token.access_token}`}
             localStorage.setItem('token', JSON.stringify(this.token));
         },
@@ -36,6 +46,11 @@ export const useSpotifyStore = defineStore('spotify', {
             this.token = JSON.parse(localStorage.getItem('token'));
             this.user = JSON.parse(localStorage.getItem('user'));
         },
+        async hasLocalToken(){
+            const local_token = localStorage.getItem('token');
+            console.log(local_token)
+        },
+
         async getEndpoint(endpoint){
             //#TODO: Discard token if response is 401
             try{
@@ -60,8 +75,7 @@ export const useSpotifyStore = defineStore('spotify', {
 
         async getPlaylists(){
             const playlists = await this.getEndpoint('me/playlists');
-            //Paginate
-            console.log(playlists);
+            return playlists;
         }
     },
     watch:{

@@ -1,6 +1,39 @@
 <script>
-import Landing from './Landing.vue'
+import Landing from './Landing.vue';
+import {useSpotifyStore} from "./stores/SpotifyAPI";
+
 export default{
+  setup(){
+    const spotifyStore = useSpotifyStore();
+    return{spotifyStore}
+  },
+  async created(){
+    // If local token already exists, check for validity
+    if(localStorage.getItem('token')){
+      const local_token = JSON.parse(localStorage.getItem('token'));
+      const now = Date.parse(new Date())
+
+      if(Date.parse(local_token.valid_until) > now){
+        console.log('still valid');
+      }else{
+        //Alert user that the token has expired
+        console.log('expired');
+      }
+     
+     /* if(now > local_token.expiration){
+        console.log('expired');
+      }else{
+        console.log('still valid')
+      }*/
+
+      //await this.spotifyStore.checkTokenValidity();
+    }else{
+      console.log('no token')
+    }
+
+
+
+  },
     components: {
         Landing
     }

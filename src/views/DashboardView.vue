@@ -1,6 +1,7 @@
 <template>
     <div>
         Dashboard
+        {{playlists}}
     </div>
 </template>
 
@@ -20,10 +21,9 @@ import {useRouter} from 'vue-router';
                 router.push('/')
             }
 
-            const playlists = spotifyStore.getPlaylists().then(()=>{console.log('got response')});
 
             return{
-                spotifyStore
+                spotifyStore, playlists
             }
         }
     }

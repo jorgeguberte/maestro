@@ -37,7 +37,7 @@ export default {
                     await spotifyStore.setUser(response);
 
 
-                    router.push('/dashboard')
+                    //router.push('/dashboard')
 
 
 

@@ -18,50 +18,6 @@ const routes = [
         if(response == true){
             next('/');
         }
-    }},
-
-    {path: '/profile', name: 'Profile', component: ()=>import('../views/Profile.vue'), beforeEnter(to, from, next){
-        //Route guard. No token, no access.
-        if(!localStorage.getItem('access_token')){
-            next('/signin');
-        }else{
-            next();
-        }
-    }},
-    {path: '/dashboard', name: 'Dashboard', component: ()=>import('../views/Dashboard.vue'), beforeEnter(to, from, next){
-        if(!localStorage.getItem('access_token')){
-            next('/signin');
-        }else{
-            next();
-        }
-    }},
-    {path: '/players', name: 'Players', component: ()=>import('../views/Players.vue'), beforeEnter(to, from, next){
-        if(!localStorage.getItem('access_token')){
-            next('/signin');
-        }else{
-            next();
-        }
-    }},
-    {path: '/player', name: 'Player', component: ()=>import('../views/Player.vue'), beforeEnter(to, from, next){
-        if(!localStorage.getItem('access_token')){
-            next('/signin');
-        }else{
-            next();
-        }
-    }},
-    {path: '/teams', name: 'Teams', component: ()=>import('../views/Teams.vue'), beforeEnter(to, from, next){
-        if(!localStorage.getItem('access_token')){
-            next('/signin');
-        }else{
-            next();
-        }
-    }},
-    {path: '/reports', name: 'Reports', component: ()=>import('../views/Reports.vue'), beforeEnter(to, from, next){
-        if(!localStorage.getItem('access_token')){
-            next('/signin');
-        }else{
-            next();
-        }
     }},*/
 
 ]
