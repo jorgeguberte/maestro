@@ -35,6 +35,7 @@ export default {
                 }else{
                     //Use response.data to populate spotifyStore.user
                     await spotifyStore.setUser(response);
+                    console.log(spotifyStore.user);
 
 
                     //router.push('/dashboard')

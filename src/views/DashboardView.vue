@@ -14,12 +14,12 @@ import {useRouter} from 'vue-router';
             const router = useRouter();
             const spotifyStore = useSpotifyStore();
 
-            spotifyStore.getLocalStorage();
+           /* spotifyStore.getLocalStorage();
 
             //If no token, redirect to login
             if(!spotifyStore.token){
                 router.push('/')
-            }
+            }*/
 
 
             return{

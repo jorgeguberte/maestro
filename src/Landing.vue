@@ -5,7 +5,15 @@
 
     export default {
         setup(){
-            const spotifyStore = useSpotifyStore()
+            const spotifyStore = useSpotifyStore();
+            const local_token = localStorage.getItem('token');
+            
+            if(!local_token){
+                console.log('no local token, do nothing')
+            }else{
+                console.log('has local token, check for validity')
+            }
+
             return{
                 spotifyStore
             }
