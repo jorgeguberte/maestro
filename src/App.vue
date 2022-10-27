@@ -6,12 +6,9 @@ export default{
   setup(){
     const spotifyStore = useSpotifyStore();
     return{spotifyStore}
+    
   },
-  async created(){
-    // If local token already exists, check for validity
 
-
-  },
     components: {
         Landing
     }

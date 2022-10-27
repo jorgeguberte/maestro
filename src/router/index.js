@@ -1,97 +1,125 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-/*
-import Home from "../views/Home.vue";
-import Signup from "../views/Signup.vue";
-*/
-//import { useApiStore } from "../stores/useApi";
 
+function isTokenValid() {
+  //Check date
+  return true;
+}
+
+function hasLocalToken() {
+  //return localStorage.getItem("token") != null;
+  const local_token = localStorage.getItem("token");
+  if (!local_token) {
+    console.log('No local token')
+    return false;
+  } else {
+    const token = JSON.parse(local_token);
+
+    const now = Date.parse(new Date());
+    if (now > token.valid_until) {
+      localStorage.removeItem("token");
+      console.log('Token expired')
+      return false;
+    } else {
+      //console.log('Token present and validated')
+      return true;
+    }
+  }
+}
 
 const routes = [
-    {path: '/', name: 'Home', component: ()=>import('../Landing.vue')},
-    {path: '/login', name: 'Login', component: ()=>import('../Landing.vue')},
-    //{path:'/auth/callback', name: 'Callback', component: ()=>import('../views/CallbackView.vue')},
-    {path:'/auth/callback', name: 'Callback', component: ()=>import('../views/CallbackView.vue'), async beforeEnter(to, from, next){
-        try{
+  {
+    path: "/",
+    name: "Home",
+    component: () => import("../Landing.vue"),
+  },
+  { path: "/login", name: "Login", component: () => import("../Landing.vue") },
+  {
+    path: "/auth/callback",
+    name: "Callback",
+    component: () => import("../views/CallbackView.vue"),
+  },
 
-        //If no error and no hash, redirect to login
-        if(!to.query || !to.hash){
-            console.log('Forbidden');
-            throw new Error('Forbidden navigation');
-        }
-
-        //If query has an error, user denied access. Redirect to home.
-        if(to.query.error){
-            //redirect to login
-            //next({name: 'Home'});
-            throw new Error('Authentication error')
-        }
-
-        if(!to.hash){
-            //next({name: 'Login'});
-            throw new Error('Forbidden navigation');
-        }
-        
-    }catch(error){
-        next({name: 'Login'});
-        return false;
-        
-    }
-        
-            /*
-            * Build token for local storage
-            */
+  {
+    path: "/dashboard",
+    name: "Dashboard",
+    component: () => import("../views/DashboardView.vue"),
+  },
 
 
-            const query_params = {};
-            const callback_payload = to.hash.slice(1).split('&');
-            callback_payload.forEach((item)=>{
-                let new_item = item.split('=');
-                query_params[new_item[0]] = new_item[1];                
-            });
-
-            //Check token validity
-            const now = Date.parse(new Date())
-            const expiration_date = new Date();
-            expiration_date.setMinutes(expiration_date.getMinutes() + (Math.floor(query_params.expires_in/60)));
-
-            query_params.valid_until = Date.parse(expiration_date);
-
-
-            localStorage.setItem('token', JSON.stringify(query_params));
-
-            next({name: 'Dashboard'});
-
-            
-        
-
-    }},
-
-    
-
-
-    
-    {path:'/dashboard', name: 'Dashboard',  component: ()=>import('../views/DashboardView.vue')},
-    
-    /*{path: '/logout', name: 'Logout', component: ()=>import('../views/Logout.vue'), async beforeEnter(to, from, next){
-        const apiStore = useApiStore();
-        const response = await apiStore.logout();
-        if(response == true){
-            next('/');
-        }
-    }},*/
-
-]
-
+];
 
 const router = createRouter({
-    history: createWebHistory(),
-    routes
-  });
+  history: createWebHistory(),
+  routes,
+});
 
+router.beforeEach((to, from, next) => {
+  switch (to.name) {
+    //If local token is present and valid, redirect to dashboard. Else, go to Landing and await user interaction.
+    case "Home":
+      if (hasLocalToken()) {
+        next("/dashboard");
+      } else {
+        next();
+      }
+      break;
 
-  
+    //If local token is already present and valid, redirect to dashboard. Else, proceed to login and await user interaction.
+    case "Login":
+      if (hasLocalToken()) {
+        next("/dashboard");
+      } else {
+        next();
+      }
+      break;
 
+    //A local token is not expected here, since it is gonna be created by the callback.
+    case "Callback":
+      console.log("Token not expected.");
+      //If query is empty, redirect to login.
+      if(to.hash){
+        //Has hash, check validity of data
+        const query_params = {};
+        const callback_payload = to.hash.slice(1).split("&");
+        
+        callback_payload.forEach((item) => {
+          let new_item = item.split("=");
+          query_params[new_item[0]] = new_item[1];
+        });
+        
+        const now = Date.parse(new Date());
+        const expiration_date = new Date();
+        expiration_date.setMinutes(
+          expiration_date.getMinutes() + Math.floor(query_params.expires_in / 60)
+        );
 
-  
-  export default router;
+        
+        const token = {
+          access_token: query_params.access_token,
+          valid_until: Date.parse(expiration_date),
+          state: query_params.state,
+        }
+        localStorage.setItem("token", JSON.stringify(token));
+        next('/dashboard');
+      }else{
+        console.log('No hash. Redirect to login');
+        next('/login');
+      }
+      
+      break;
+
+      //A local token is expected. If no valid token exists, redirect to login
+    case "Dashboard":
+      if(hasLocalToken()){
+        next();
+      }else{
+        next({name: "Login"});
+      }
+      break;  
+    default:
+      console.log("Figure it out");
+      console.log(to.name);
+  }
+});
+export default router;

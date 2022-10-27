@@ -6,13 +6,7 @@
     export default {
         setup(){
             const spotifyStore = useSpotifyStore();
-            const local_token = localStorage.getItem('token');
-            
-            if(!local_token){
-                console.log('no local token, do nothing')
-            }else{
-                console.log('has local token, check for validity')
-            }
+
 
             return{
                 spotifyStore
@@ -28,6 +22,8 @@
                 <li><a v-bind:href="this.spotifyStore.getAuthURL()"> Login with Spotify</a></li>
             </ol>
         </nav>
+
+        <router-link to="dashboard">Dashboard</router-link>
     </div>
 </template>
 

@@ -27,21 +27,18 @@ export const useSpotifyStore = defineStore('spotify', {
             url += '&state=' + encodeURIComponent(this.spotifyState);
             return url;
         },
-        async setToken(token){
-            /*const expiration = new Date();
-            expiration.setMinutes(expiration.getMinutes() + (token.expires_in/60));
-            console.log(expiration)
-            token.expiration = expiration;*/
-
-            const expiration_date = new Date();
-            expiration_date.setMinutes(expiration_date.getMinutes() + (Math.floor(token.expires_in/960)));
-            token.valid_until = expiration_date;
-            this.token = token;
-
+        async setToken(){
+            this.token = JSON.parse(localStorage.getItem('token'));//Retrieve token from local storage
             
+
             axios.defaults.headers.common = {'Authorization': `Bearer ${this.token.access_token}`}
-            localStorage.setItem('token', JSON.stringify(this.token));
         },
+
+        async unsetToken(){
+            delete this.token;
+            delete axios.defaults.headers.common['Authorization'];
+        },
+
         async getLocalStorage(){
             this.token = JSON.parse(localStorage.getItem('token'));
             this.user = JSON.parse(localStorage.getItem('user'));
