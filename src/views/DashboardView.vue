@@ -12,7 +12,8 @@ const count = ref(0);
 const state = reactive({
     user: null,
     playlists: [],
-    playlists_error: false
+    playlists_error: false,
+    selected_playlist: null,
 });
 
 spotifyStore.getEndpoint('/me').then((response) => {
@@ -42,38 +43,43 @@ function fetchPlaylists(offset){
 
 fetchPlaylists(0);
 
-/*fetchPlaylistsPage(0).then(async(response)=>{
+const playlist_buffer = [];
+
+async function fetchPlaylistTracks(playlist_href){
+  console.log(playlist_href)
+  const response = await spotifyStore.getEndpoint(playlist_href);
   if(!response){
-    state.playlists = false;
+    console.log('Error fetching playlist tracks');
     return false;
-  }else{
-    state.playlists = response.items;
+
+  } else{
+    console.log('all good')
   }
-
-  fetchPlaylists();
-})*/
-
-/*
-
-spotifyStore.getEndpoint('/me/playlists?limit=50').then(async (response) => {
-
-  if(!response){
-    state.playlists = false;
-    return false;
+  playlist_buffer.push(...response.items);
+  if(response.next){
+    await fetchPlaylistTracks(response.next);
   }else{
-    console.log(response);
-    if(response.next){
-    }
-    state.playlists = response.items;
+    return playlist_buffer;
   }
-});
-
-
-*/
-
-function increaseCount(){
-    count.value++;
 }
+
+async function selectPlaylist(playlist){
+  //const tracks = await spotifyStore.getEndpoint(playlist.tracks.href);
+  const tracks = await fetchPlaylistTracks(playlist.tracks.href).then(async (response)=>{
+    if(!response){
+      state.selected_playlist = null;
+    }else{
+      state.selected_playlist = playlist;
+      console.log(response)
+    }
+    
+  })
+}
+
+
+
+
+
 
 onBeforeMount(async () => {
     state.user = await spotifyStore.getEndpoint('/me');
@@ -81,20 +87,39 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-    <button @click="increaseCount">Count: {{count}}</button>
-    <div>
-        <p v-if="!state.user">loading user profile</p>
-        <p v-if="state.user">{{state.user.display_name}}</p>
-    </div>
-    <div>
-        <p v-if="state.playlists.length == 0 && !state.playlists_error">loading playlists</p>
-        <p v-if="state.playlists_error ">error loading playlists</p>
-    </div>
-    <div v-if="state.playlists.length > 0">
-      <ul>
-        <li v-for="playlist in state.playlists" :key="playlist.id">
-          {{playlist.name}}
+  <div class="dashboard__container">
+    <div class="h-full bg-blue-200 w-1/5 overflow-y-scroll">
+      <div v-if="state.user">{{state.user.display_name}}</div>
+      <ul> 
+        <li v-for="playlist in state.playlists" v-bind:key="playlist.id">
+          <a href="#" @click="selectPlaylist(playlist)">{{playlist.name}}</a>
         </li>
       </ul>
     </div>
+    <div class="dashboard__content">
+      <div v-if="!state.selected_playlist">Select a playlist to get the analysis</div>
+      <div v-if="state.selected_playlist">
+        <p>{{state.selected_playlist.name}}</p>
+        <small>by {{state.selected_playlist.owner.display_name }}</small>
+        <p v-if="state.selected_playlist.description">{{state.selected_playlist.description}}</p>
+        <ul v-if="state.selected_playlist.tracks">
+          <li v-for="track in state.selected_playlist.tracks" v-bind:key="track.id">
+            <!--<p>
+              <span v-for="artist in track.track.artists">{{artist.name}}</span>
+            {{track.track.name}}
+          </p>-->
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </template>
+
+<style scoped>
+.dashboard__container{
+  @apply bg-red-100 w-screen h-screen flex flex-row
+}
+.dashboard__content{
+  @apply h-screen w-4/5 bg-green-100
+}
+</style>
