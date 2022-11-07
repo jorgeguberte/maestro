@@ -71,9 +71,7 @@ export const useSpotifyStore = defineStore('spotify', {
         },
 
         async getPlaylists(){
-            console.log('Getting playlists');
             const playlists = await this.getEndpoint('me/playlists');
-            console.log(playlists);
             return playlists;
         }
     },
