@@ -15,6 +15,9 @@ const state = reactive({
     playlists: [],
     playlists_error: false,
     selected_playlist: null,
+    selected_playlist_status: false,
+    selected_playlist_tracks: [],
+    track_fetch_status: false
 });
 
 //Get the user's profile
@@ -47,48 +50,46 @@ function fetchPlaylists(offset){
 //Fetch first page of playlists, 0 offset
 fetchPlaylists(0);
 
-const playlist_buffer = []; //Holds a playlist's tracks as they are loaded
-
-async function fetchPlaylistTracks(playlist_href){
-  console.log(playlist_href)
-  const response = await spotifyStore.getEndpoint(playlist_href);
-
+async function fetchTracks(tracks_href){
+  //Fetch track list
+  const response = await spotifyStore.getEndpoint(tracks_href);
   if(!response){
-    console.log('Error fetching playlist tracks 1');
-    return false;
-
-  } else{
-    console.log(response);
-    //console.log('Fetched playlist tracks page')//#TODO: here debugging purposes. remove it.
-    //console.log(response);
-  }
-  playlist_buffer.push(...response.items);
-  if(response.next){
-    await fetchPlaylistTracks(response.next);
+    state.track_fetch_status = false;
+    throw new Error('Couldnt fetch tracks')
   }else{
-    return playlist_buffer;
+    /*for(const track of response.items){
+      state.selected_playlist_tracks.push(track.track);
+    }*/
+    state.selected_playlist_tracks = [...state.selected_playlist_tracks, ...response.items];
+  }
+  
+
+  if(response.next){
+    await fetchTracks(response.next);
+  }else{
+    state.track_fetch_status = true;
+    return true
   }
 }
 
 async function selectPlaylist(playlist){
-  console.log('Selecting playlist');
-  //console.log(playlist);
-  /*const tracks = await fetchPlaylistTracks(playlist.tracks.href).then(async (response)=>{
-    console.log(response);
-    if(!response){
-      console.log('Error fetching playlist tracks 2');
-      state.selected_playlist = null;
-    }else{
-      console.log('All playlist tracks fetched');
-      //console.log(response);
-      state.selected_playlist = playlist;
-      state.selected_playlist.tracks = response;
-    }
-    
-  })*/
+  state.selected_playlist = false;
+  state.selected_playlist_status = false;
+  state.selected_playlist_tracks = [];
+  const tracks_fetch = await fetchTracks(playlist.tracks.href);
+  if(!state.track_fetch_status){
+    console.log('no')
+  }else{
+    state.selected_playlist  = playlist;
+    state.selected_playlist_status = true;
+  }
 
+  
 
-  const tracks = await fetchAllPlaylistTracks(playlist.tracks.href);
+  //Attempt to fetch tracks from the playlist
+  //Throw error if it fails
+  //If success, set selected playlist
+
 }
 
 
@@ -117,9 +118,11 @@ async function selectPlaylist(playlist){
         <p>{{state.selected_playlist.name}}</p>
         <small>by {{state.selected_playlist.owner.display_name }}</small>
         <p v-if="state.selected_playlist.description">{{state.selected_playlist.description}}</p>
-        <ul v-if="state.selected_playlist.tracks">
-          <li v-for="track in state.selected_playlist.tracks" v-bind:key="track.id">
-            <pre>{{track.track.name}} - {{track.track.artists[0].name}}</pre>
+        
+        <ul>
+          sasa
+          <li v-for="track in state.selected_playlist_tracks" v-bind:key="track.id">
+            {{track.track.name}} - {{track.track.artists[0].name}}
             <!--<p>
               <span v-for="artist in track.track.artists">{{artist.name}}</span>
             {{track.track.name}}
