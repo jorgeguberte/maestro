@@ -17,7 +17,8 @@ const state = reactive({
     selected_playlist: null,
     selected_playlist_status: false,
     selected_playlist_tracks: [],
-    track_fetch_status: false
+    track_fetch_status: false,
+    loading_playlist: false
 });
 
 //Get the user's profile
@@ -68,11 +69,13 @@ async function fetchTracks(tracks_href){
     await fetchTracks(response.next);
   }else{
     state.track_fetch_status = true;
+    state.loading_playlist = false;
     return true
   }
 }
 
 async function selectPlaylist(playlist){
+  state.loading_playlist = true;
   state.selected_playlist = false;
   state.selected_playlist_status = false;
   state.selected_playlist_tracks = [];
@@ -114,6 +117,7 @@ async function selectPlaylist(playlist){
     </div>
     <div class="dashboard__content">
       <div v-if="!state.selected_playlist">Select a playlist to get the analysis</div>
+      <div v-if="state.loading_playlist">Loading</div>
       <div v-if="state.selected_playlist">
         <p>{{state.selected_playlist.name}}</p>
         <small>by {{state.selected_playlist.owner.display_name }}</small>
