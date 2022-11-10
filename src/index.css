@@ -8,3 +8,20 @@ h1,h2,h3{
 h1{
     @apply text-4xl;
 }
+
+/* width */
+::-webkit-scrollbar {
+    width: 12px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background-color: rgba(0,0,0,0.1);
+    border-radius: 10px;
+  }
+  
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: rgba(0,0,0,0.3);
+  }

@@ -58,9 +58,6 @@ async function fetchTracks(tracks_href){
     state.track_fetch_status = false;
     throw new Error('Couldnt fetch tracks')
   }else{
-    /*for(const track of response.items){
-      state.selected_playlist_tracks.push(track.track);
-    }*/
     state.selected_playlist_tracks = [...state.selected_playlist_tracks, ...response.items];
   }
   
@@ -87,11 +84,6 @@ async function selectPlaylist(playlist){
     state.selected_playlist_status = true;
   }
 
-  
-
-  //Attempt to fetch tracks from the playlist
-  //Throw error if it fails
-  //If success, set selected playlist
 
 }
 
@@ -107,26 +99,45 @@ async function selectPlaylist(playlist){
 
 <template>
   <div class="dashboard__container">
-    <div class="h-full bg-blue-200 w-1/5 overflow-y-scroll">
-      <div v-if="state.user">{{state.user.display_name}}</div>
-      <ul> 
+
+    <!--<div class="h-full bg-blue-200 w-1/5">
+      <div class="h-52">sasa</div>
+      <ul class="inherit h-full overflow-y-scroll"> 
         <li v-for="playlist in state.playlists" v-bind:key="playlist.id">
           <a href="#" @click="selectPlaylist(playlist)">{{playlist.name}}</a>
         </li>
       </ul>
+    </div>-->
+    <div class="sidebarContainer w-1/5">
+      <div class="sidebarLid h-1/3 pl-3 bg-red-300">
+        <div class="w-20 h-20 bg-red-200 items-center flex justify-center text-5xl">M</div>
+        <p class="mt-5 text-xl font-bold">Welcome to Maestro, {{state.user.display_name}}</p>
+        <p class="mt-16">Select a playlist below to get the analysis</p>
+      </div>
+      <div class="sidebarContent h-2/3 overflow-y-scroll">
+        <ul class="h-full pl-3 mt-3"> 
+        <li v-for="playlist in state.playlists" v-bind:key="playlist.id">
+          <a href="#" @click="selectPlaylist(playlist)">{{playlist.name}}</a>
+        </li>
+      </ul>
+      </div>
+
     </div>
+
     <div class="dashboard__content">
       <div v-if="!state.selected_playlist">Select a playlist to get the analysis</div>
       <div v-if="state.loading_playlist">Loading</div>
+
       <div v-if="state.selected_playlist">
-        <p>{{state.selected_playlist.name}}</p>
+        <img :src="state.selected_playlist.images[0].url" class="w-48"/>
+        <p class="text-3xl font-bold">{{state.selected_playlist.name}}</p>
         <small>by {{state.selected_playlist.owner.display_name }}</small>
         <p v-if="state.selected_playlist.description">{{state.selected_playlist.description}}</p>
         
         <ul>
-          sasa
           <li v-for="track in state.selected_playlist_tracks" v-bind:key="track.id">
-            {{track.track.name}} - {{track.track.artists[0].name}}
+            <p class="pt-3 font-medium">{{track.track.name}}</p>
+            <p class="text-sm">{{track.track.artists[0].name}}</p>
             <!--<p>
               <span v-for="artist in track.track.artists">{{artist.name}}</span>
             {{track.track.name}}
@@ -143,6 +154,6 @@ async function selectPlaylist(playlist){
   @apply bg-red-100 w-screen h-screen flex flex-row
 }
 .dashboard__content{
-  @apply h-screen w-4/5 bg-green-100
+  @apply h-screen w-4/5 bg-green-100 overflow-y-scroll pl-3 pt-3
 }
 </style>
