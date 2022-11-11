@@ -111,14 +111,15 @@ async function selectPlaylist(playlist){
         <small>by {{state.selected_playlist.owner.display_name }}</small>
         <p v-if="state.selected_playlist.description">{{state.selected_playlist.description}}</p>
         
-        <ul>
+        <ul class="mb-5">
           <li v-for="track in state.selected_playlist_tracks" v-bind:key="track.id">
-            <p class="pt-3 font-medium">{{track.track.name}}</p>
-            <p class="text-sm">{{track.track.artists[0].name}}</p>
-            <!--<p>
-              <span v-for="artist in track.track.artists">{{artist.name}}</span>
-            {{track.track.name}}
-          </p>-->
+            <div class="flex mt-4">
+              <img :src="track.track.album.images[0].url" class="w-12"/>
+              <div class="ml-4">
+                <p class="font-bold">{{track.track.name}}</p>
+                <small>by {{track.track.artists[0].name}}</small>
+              </div>
+            </div>
           </li>
         </ul>
       </div>
