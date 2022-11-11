@@ -17,7 +17,7 @@ defineProps(['user','playlists'])
       <div class="sidebarContent h-2/3 overflow-y-scroll">
         <ul class="h-full pl-3 mt-3"> 
         <li v-if="playlists" v-for="playlist in playlists" :key="playlist.id">
-          <a href="#" @click="this.parent.selectPlaylist(playlist.id)">{{playlist.name}}</a>
+          <a href="#" @click="$emit('selectPlaylist',playlist)">{{playlist.name}}</a>
         </li>
       </ul>
       </div>

@@ -94,14 +94,11 @@ async function selectPlaylist(playlist){
 
 
 
-
-
-
 </script>
 
 <template>
   <div class="dashboard__container">
-    <SidebarComponent :user="state.user" :playlists="state.playlists"/>
+    <SidebarComponent :user="state.user" :playlists="state.playlists" @selectPlaylist="(playlist_id)=>selectPlaylist(playlist_id)"/>
 
 
     <div class="dashboard__content">
