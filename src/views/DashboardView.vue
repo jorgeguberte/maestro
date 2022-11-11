@@ -2,6 +2,8 @@
 import {ref, onMounted, reactive, onBeforeMount} from 'vue'
 import { useSpotifyStore } from "../stores/SpotifyAPI";
 
+import SidebarComponent from '../components/Dashboard/SidebarComponent.vue'
+
 //Initiate the store
 const spotifyStore = useSpotifyStore();
 spotifyStore.setToken();
@@ -99,30 +101,8 @@ async function selectPlaylist(playlist){
 
 <template>
   <div class="dashboard__container">
+    <SidebarComponent :user="state.user" :playlists="state.playlists"/>
 
-    <!--<div class="h-full bg-blue-200 w-1/5">
-      <div class="h-52">sasa</div>
-      <ul class="inherit h-full overflow-y-scroll"> 
-        <li v-for="playlist in state.playlists" v-bind:key="playlist.id">
-          <a href="#" @click="selectPlaylist(playlist)">{{playlist.name}}</a>
-        </li>
-      </ul>
-    </div>-->
-    <div class="sidebarContainer w-1/5">
-      <div class="sidebarLid h-1/3 pl-3 bg-red-300">
-        <div class="w-20 h-20 bg-red-200 items-center flex justify-center text-5xl">M</div>
-        <p class="mt-5 text-xl font-bold">Welcome to Maestro, {{state.user.display_name}}</p>
-        <p class="mt-16">Select a playlist below to get the analysis</p>
-      </div>
-      <div class="sidebarContent h-2/3 overflow-y-scroll">
-        <ul class="h-full pl-3 mt-3"> 
-        <li v-for="playlist in state.playlists" v-bind:key="playlist.id">
-          <a href="#" @click="selectPlaylist(playlist)">{{playlist.name}}</a>
-        </li>
-      </ul>
-      </div>
-
-    </div>
 
     <div class="dashboard__content">
       <div v-if="!state.selected_playlist">Select a playlist to get the analysis</div>
