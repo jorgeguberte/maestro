@@ -17,11 +17,15 @@ h1{
   /* Track */
   ::-webkit-scrollbar-track {
     background-color: rgba(0,0,0,0.1);
-    border-radius: 10px;
+    border-radius: 2px;
   }
   
   /* Handle */
   ::-webkit-scrollbar-thumb {
-    border-radius: 10px;
+    border-radius: 2px;
     background-color: rgba(0,0,0,0.3);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0,0,0,0.4);
   }
