@@ -6,8 +6,8 @@ defineProps(['user','playlists'])
 
 <template>
     <div class="sidebarContainer w-1/5">
-      <div class="sidebarLid h-1/3 pl-3 bg-red-300">
-        <div class="w-20 h-20 bg-red-200 items-center flex justify-center text-5xl">M</div>
+      <div class="sidebarLid h-1/3 pl-3">
+        <div class="w-20 h-20 bg-neutral-900 text-neutral-100 items-center flex justify-center text-5xl">M</div>
         <p class="mt-5 text-xl font-bold" v-if="!user">
             <i class="fa-solid fa-spinner animate-spin"></i>
         </p>

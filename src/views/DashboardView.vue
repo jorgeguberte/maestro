@@ -8,6 +8,7 @@ import PlaylistHeader from '../components/Dashboard/PlaylistHeader.vue'
 import TrackList from '../components/Dashboard/TrackList.vue'
 
 
+
 //Initiate the store
 const spotifyStore = useSpotifyStore();
 spotifyStore.setToken();
@@ -186,7 +187,7 @@ async function selectPlaylist(playlist){
 
       <div v-if="state.selected_playlist">
         
-        <div class="flex bg-blue-300 pl-12 pt-14 pb-12 sticky top-0">
+        <div class="flex border-b bg-white pl-12 pt-14 pb-12 sticky top-0">
         <PlaylistHeader :img_url="state.selected_playlist.images[0].url" :playlist_name="state.selected_playlist.name" :playlist_owner="state.selected_playlist.owner.display_name" :playlist_total_tracks="state.selected_playlist.tracks.total" :playlist_description="state.selected_playlist.description" :analysis_status="state.analysis_status"/>
       </div>
 
@@ -200,9 +201,9 @@ async function selectPlaylist(playlist){
 
 <style scoped>
 .dashboard__container{
-  @apply bg-red-100 w-screen h-screen flex flex-row
+  @apply  w-screen h-screen flex flex-row
 }
 .dashboard__content{
-  @apply h-screen w-4/5 bg-green-100 overflow-y-scroll
+  @apply h-screen w-4/5  overflow-y-scroll
 }
 </style>
