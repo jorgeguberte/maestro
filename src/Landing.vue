@@ -23,7 +23,6 @@
             </ol>
         </nav>
 
-        <router-link to="dashboard">Dashboard</router-link>
     </div>
 </template>
 

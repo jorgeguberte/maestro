@@ -1,12 +1,18 @@
 <script setup>
 import {ref, onMounted, reactive, onBeforeMount} from 'vue'
 import { useSpotifyStore } from "../stores/SpotifyAPI";
+import { usePlaylistStore} from "../stores/PlaylistsStore";
 
 import SidebarComponent from '../components/Dashboard/SidebarComponent.vue'
+import PlaylistHeader from '../components/Dashboard/PlaylistHeader.vue'
+import TrackList from '../components/Dashboard/TrackList.vue'
+
 
 //Initiate the store
 const spotifyStore = useSpotifyStore();
 spotifyStore.setToken();
+
+const playlistStore = usePlaylistStore();
 
 
 
@@ -26,6 +32,8 @@ const state = reactive({
     analysis_args: '',
     
 });
+
+//Data provided to the child components
 
 //Get the user's profile
 onBeforeMount(async () => {
@@ -58,6 +66,7 @@ function fetchPlaylists(offset){
 fetchPlaylists(0);
 
 async function fetchTracks(tracks_href){
+  state.analysis_args = '';//Reset analysis url
   //Fetch track list
   const response = await spotifyStore.getEndpoint(tracks_href);
   if(!response){
@@ -73,14 +82,15 @@ async function fetchTracks(tracks_href){
     //Fetch analysis
 
     const analysis_response = await spotifyStore.getEndpoint(`/audio-features?ids=${state.analysis_args}`);
+    
     if(!analysis_response){
       throw new Error('Couldnt fetch analysis');
     }else{
-      state.analysis_buffer = analysis_response;
+      //state.analysis_buffer.push(analysis_response.audio_features);
+      for(const feature of analysis_response.audio_features){
+        state.analysis_buffer.push(feature);
+      }
     }
-
-
-
   }
   
 
@@ -109,7 +119,9 @@ async function selectPlaylist(playlist){
   }else{
     state.selected_playlist  = playlist;
     state.selected_playlist_status = true;
-    state.analysis_status = 'loading';
+
+    //console.log(state.analysis_buffer.length);
+   state.analysis_status = 'loading';
     
 
     let playlist_danceability = 0;
@@ -120,7 +132,7 @@ async function selectPlaylist(playlist){
 
     let playlist_tempo = 0;
 
-    for(const track of state.analysis_buffer.audio_features){
+    for(const track of state.analysis_buffer){
       playlist_danceability += track.danceability;
       playlist_energy += track.energy;
       key_count[track.key] = key_count[track.key] ? key_count[track.key] + 1 : 1;
@@ -128,9 +140,8 @@ async function selectPlaylist(playlist){
       playlist_tempo += Math.ceil(track.tempo);
     }
 
-    console.log(playlist_tempo)
-    console.log(Math.floor(playlist_tempo/state.selected_playlist_tracks.length));
-    //console.log(state.analysis_buffer)
+    
+    
 
     var key_count_index = 0;
 
@@ -140,21 +151,19 @@ async function selectPlaylist(playlist){
       }
     }
 
-    const playlist_key = keys_table[key_count_index];
+    state.playlist_key = keys_table[key_count_index];
     
-    playlist_danceability = playlist_danceability / state.analysis_buffer.length;
-    playlist_energy = playlist_energy / state.analysis_buffer.length;
-
-    
-   
-
-
-
+    state.playlist_danceability = playlist_danceability / state.analysis_buffer.length;
+    state.playlist_energy = playlist_energy / state.analysis_buffer.length;
 
     
+
+    playlistStore.key = keys_table[key_count_index];
+    playlistStore.danceability = (playlist_danceability / state.analysis_buffer.length).toFixed(2);
+    playlistStore.energy = (playlist_energy / state.analysis_buffer.length).toFixed(2);
+
+    state.analysis_status = 'loaded';
   }
-
-
 }
 
 
@@ -168,44 +177,22 @@ async function selectPlaylist(playlist){
   <div class="dashboard__container">
     <SidebarComponent :user="state.user" :playlists="state.playlists" @selectPlaylist="(playlist_id)=>selectPlaylist(playlist_id)"/>
 
-
     <div class="dashboard__content">
-      <div v-if="!state.selected_playlist">Select a playlist to get the analysis</div>
-      <div v-if="state.loading_playlist">Loading</div>
+      <!--<div v-if="!state.selected_playlist">Select a playlist to get the analysis</div>-->
+      <div v-if="state.loading_playlist" class=" flex justify-center items-center h-full flex-col">
+        <i class="fa-solid fa-spinner animate-spin"></i>
+        <p class="pt-2">Loading Playlist</p>
+      </div>
 
       <div v-if="state.selected_playlist">
         
-        
         <div class="flex bg-blue-300 pl-12 pt-14 pb-12 sticky top-0">
-          <img :src="state.selected_playlist.images[0].url" class="w-40"/>
-          <div class="ml-4 pt-8">
-            <p class="font-bold text-4xl">{{state.selected_playlist.name}}</p>
-            <p>by {{state.selected_playlist.owner.display_name}}</p>
+        <PlaylistHeader :img_url="state.selected_playlist.images[0].url" :playlist_name="state.selected_playlist.name" :playlist_owner="state.selected_playlist.owner.display_name" :playlist_total_tracks="state.selected_playlist.tracks.total" :playlist_description="state.selected_playlist.description" :analysis_status="state.analysis_status"/>
+      </div>
 
-            <p class="mt-3">{{state.selected_playlist.description}}</p>
-          </div>
-          <div class="bg-red-300 w-3/5 ml-4 right-0 absolute ">
-            <p v-if="state.analysis_status == 'loading'">Loading Playlist Analysis</p>
-          </div>
-        </div>
-
-
-        <!--<img :src="state.selected_playlist.images[0].url" class="w-48"/>
-        <p class="text-3xl font-bold">{{state.selected_playlist.name}}</p>
-        <small>by {{state.selected_playlist.owner.display_name }}</small>
-        <p v-if="state.selected_playlist.description">{{state.selected_playlist.description}}</p>-->
         
-        <ul class="mb-5 pt-8 pl-12">
-          <li v-for="track in state.selected_playlist_tracks" v-bind:key="track.id">
-            <div class="flex mt-4">
-              <img :src="track.track.album.images[0].url" class="w-12"/>
-              <div class="ml-4">
-                <p class="font-bold">{{track.track.name}}</p>
-                <small>by {{track.track.artists[0].name}}</small>
-              </div>
-            </div>
-          </li>
-        </ul>
+        <!--Tracklist-->
+        <TrackList :tracks="state.selected_playlist_tracks"/>
       </div>
     </div>
   </div>
