@@ -1,5 +1,33 @@
-<script setup>
-defineProps(['user','playlists'])
+<script>
+
+import { usePlaylistStore } from '../../stores/PlaylistsStore';
+
+const playlistStore = usePlaylistStore();
+
+export default{
+  props: ['user','playlists'],
+    setup() {
+
+        return {
+            playlistStore
+        }
+    },
+
+    data(){
+      return{
+        active_playlist_id:'',
+      }
+    },
+    methods:{
+      setActive(playlist){
+        this.active_playlist_id = playlist.id;
+        this.$emit('selectPlaylist',playlist); 
+      }
+    },
+
+}
+
+
 
 
 </script>
@@ -19,7 +47,7 @@ defineProps(['user','playlists'])
       <div class="sidebarContent h-2/3 overflow-y-scroll">
         <ul class="h-full pl-3 mt-3"> 
         <li v-if="playlists" v-for="playlist in playlists" :key="playlist.id">
-          <a href="#" @click="$emit('selectPlaylist',playlist)">{{playlist.name}}</a>
+          <a href="#" class="hover:font-semibold" :class="{active: this.active_playlist_id == playlist.id}" @click="setActive(playlist)">{{playlist.name}}</a>
         </li>
       </ul>
       </div>
@@ -29,6 +57,8 @@ defineProps(['user','playlists'])
 
 
 
-<style lang="scss" scoped>
-
+<style  scoped>
+.active{
+  @apply underline font-semibold
+}
 </style>
