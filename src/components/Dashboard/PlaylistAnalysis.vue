@@ -3,6 +3,20 @@ import { usePlaylistStore } from '../../stores/PlaylistsStore';
 
 const playlistStore = usePlaylistStore();
 
+
+function getValenceColor(valence){
+  let valence_color;
+  if(valence <= 0.3){
+    valence_color = 'text-red-500';
+  }else if(valence <= 0.6){
+    valence_color = 'text-yellow-500';
+  }else{
+    valence_color = 'text-green-500';
+
+  }
+
+  return valence_color;
+}
 </script>
 
 <template>
@@ -15,11 +29,16 @@ const playlistStore = usePlaylistStore();
             </div>
           </div>-->
 
-          <div class="w-2/5 grid grid-flow-col grid-cols-3 text-center place-items-center">
+          <div class="w-2/5 grid grid-flow-col grid-cols-5 text-center place-items-center">
             
             <div class=" text-center w-full">
               <p class="text-2xl">{{playlistStore.key}}</p>
               <p class="text-sm">Predominant Key</p>
+            </div>
+
+            <div class="text-center w-full">
+              <p class="text-xl">{{playlistStore.tempo}}</p>
+              <p class="text-sm">Avg. BPM</p>
             </div>
 
             <div class="text-center w-full">
@@ -31,6 +50,12 @@ const playlistStore = usePlaylistStore();
               <p class="text-xl">{{playlistStore.danceability}}</p>
               <p class="text-sm">Avg. Danceability</p>
             </div>
+
+            <div class="text-center w-full" >
+              <p class="text-xl" :class="getValenceColor(playlistStore.valence)">{{playlistStore.valence}}</p>
+              <p class="text-sm">Mood</p>
+            </div>
+            
           </div>
 </template>
 

@@ -127,11 +127,15 @@ async function selectPlaylist(playlist){
 
     let playlist_danceability = 0;
     let playlist_energy = 0;
+
     const key_count = {}
     
     const keys_table = {0: 'C', 1: 'C#', 2: 'D', 3: 'D#', 4: 'E', 5: 'F', 6: 'F#', 7: 'G', 8: 'G#', 9: 'A', 10: 'A#', 11: 'B'};
 
     let playlist_tempo = 0;
+    let playlist_valence = 0;
+
+    
 
     for(const track of state.analysis_buffer){
       playlist_danceability += track.danceability;
@@ -139,6 +143,8 @@ async function selectPlaylist(playlist){
       key_count[track.key] = key_count[track.key] ? key_count[track.key] + 1 : 1;
 
       playlist_tempo += Math.ceil(track.tempo);
+
+      playlist_valence += track.valence;
     }
 
     
@@ -162,6 +168,10 @@ async function selectPlaylist(playlist){
     playlistStore.key = keys_table[key_count_index];
     playlistStore.danceability = (playlist_danceability / state.analysis_buffer.length).toFixed(2);
     playlistStore.energy = (playlist_energy / state.analysis_buffer.length).toFixed(2);
+
+    playlistStore.tempo = Math.floor(playlist_tempo / state.analysis_buffer.length);
+
+    playlistStore.valence = (playlist_valence/state.analysis_buffer.length).toFixed(1);
 
     state.analysis_status = 'loaded';
   }
