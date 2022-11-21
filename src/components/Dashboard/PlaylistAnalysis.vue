@@ -5,17 +5,28 @@ const playlistStore = usePlaylistStore();
 
 
 function getValenceColor(valence){
-  let valence_color;
-  if(valence <= 0.3){
-    valence_color = 'text-red-500';
+  let valence_color, valence_icon;
+  if(valence <= 0.2){
+    valence_color = 'text-purple-900';
+    valence_icon = 'fa-face-sad-tear';
+  }else if(valence <= 0.4){
+    valence_color = 'text-blue-600';
+    valence_icon = 'fa-face-meh';
   }else if(valence <= 0.6){
-    valence_color = 'text-yellow-500';
+    valence_color = 'text-green-300';
+    valence_icon = 'fa-face-smile';
+  }else if(valence <= 0.8){
+    valence_color = 'text-green-500';
+    valence_icon = 'fa-face-laugh-beam';
+  
   }else{
     valence_color = 'text-green-500';
-
+    valence_icon = 'fa-face-grin-stars';
   }
 
-  return valence_color;
+  
+
+  return {'color': valence_color, 'icon':valence_icon};
 }
 </script>
 
@@ -52,7 +63,7 @@ function getValenceColor(valence){
             </div>
 
             <div class="text-center w-full" >
-              <p class="text-xl" :class="getValenceColor(playlistStore.valence)">{{playlistStore.valence}}</p>
+              <i class="fa-regular text-2xl" :class="getValenceColor(playlistStore.valence).icon, getValenceColor(playlistStore.valence).color"></i>
               <p class="text-sm">Mood</p>
             </div>
             
