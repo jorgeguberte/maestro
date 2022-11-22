@@ -114,6 +114,8 @@ async function selectPlaylist(playlist){
   state.analysis_args = '';
 
 
+
+
   const tracks_fetch = await fetchTracks(playlist.tracks.href);
   if(!state.track_fetch_status){
     console.log('no')
@@ -134,7 +136,7 @@ async function selectPlaylist(playlist){
 
     let playlist_tempo = 0;
     let playlist_valence = 0;
-
+    let playlist_mode = 0;
     
 
     for(const track of state.analysis_buffer){
@@ -145,8 +147,11 @@ async function selectPlaylist(playlist){
       playlist_tempo += Math.ceil(track.tempo);
 
       playlist_valence += track.valence;
+
+      playlist_mode += track.mode;
     }
 
+  
     
     
 
@@ -172,6 +177,9 @@ async function selectPlaylist(playlist){
     playlistStore.tempo = Math.floor(playlist_tempo / state.analysis_buffer.length);
 
     playlistStore.valence = (playlist_valence/state.analysis_buffer.length).toFixed(1);
+
+    playlistStore.mode = (playlist_mode/state.analysis_buffer.length) > 0.5 ? 'Major' : 'Minor';
+  
 
     state.analysis_status = 'loaded';
   }

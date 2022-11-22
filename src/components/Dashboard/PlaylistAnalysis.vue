@@ -40,31 +40,35 @@ function getValenceColor(valence){
             </div>
           </div>-->
 
-          <div class="w-2/5 grid grid-flow-col grid-cols-5 text-center place-items-center">
+          <div class="w-2/5 grid grid-flow-col grid-cols-6 text-center place-items-center">
             
             <div class=" text-center w-full">
               <p class="text-2xl">{{playlistStore.key}}</p>
-              <p class="text-sm">Predominant Key</p>
+              <p class="text-xs">Predominant Key</p>
+            </div>
+            <div class=" text-center w-full">
+              <p class="text-2xl">{{playlistStore.mode}}</p>
+              <p class="text-xs">Predominant Mode</p>
             </div>
 
             <div class="text-center w-full">
               <p class="text-xl">{{playlistStore.tempo}}</p>
-              <p class="text-sm">Avg. BPM</p>
+              <p class="text-xs">Avg. BPM</p>
             </div>
 
             <div class="text-center w-full">
               <p class="text-xl">{{playlistStore.energy}}</p>
-              <p class="text-sm">Avg. Energy</p>
+              <p class="text-xs">Avg. Energy</p>
             </div>
             
             <div class="text-center w-full">
               <p class="text-xl">{{playlistStore.danceability}}</p>
-              <p class="text-sm">Avg. Danceability</p>
+              <p class="text-xs">Avg. Danceability</p>
             </div>
 
             <div class="text-center w-full" >
               <i class="fa-regular text-2xl" :class="getValenceColor(playlistStore.valence).icon, getValenceColor(playlistStore.valence).color"></i>
-              <p class="text-sm">Mood</p>
+              <p class="text-xs">Mood</p>
             </div>
             
           </div>
