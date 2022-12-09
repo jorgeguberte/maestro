@@ -8,8 +8,13 @@ export const usePlaylistStore = defineStore("playlists", {
       tempo:0,
       valence:0,
       active_playlist_id: "",
+      analysis_buffer: [],
     };
   },
 
-  actions: {},
+  actions: {
+    resetAnalysisBuffer() {
+      this.analysis_buffer = [];
+    }
+  },
 });

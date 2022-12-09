@@ -113,17 +113,19 @@ async function selectPlaylist(playlist){
   state.analysis_buffer = [];
   state.analysis_args = '';
 
+  
+
 
 
 
   const tracks_fetch = await fetchTracks(playlist.tracks.href);
   if(!state.track_fetch_status){
-    console.log('no')
+    console.log('no') //#TODO: Handle error
   }else{
     state.selected_playlist  = playlist;
     state.selected_playlist_status = true;
 
-    //console.log(state.analysis_buffer.length);
+    
    state.analysis_status = 'loading';
     
 
@@ -182,6 +184,14 @@ async function selectPlaylist(playlist){
   
 
     state.analysis_status = 'loaded';
+
+    playlistStore.resetAnalysisBuffer(); //empty the analysis buffer in the store so we can store the new data in it
+
+    playlistStore.analysis_buffer = [...state.analysis_buffer];
+    for(const track_index in state.selected_playlist_tracks){
+        state.selected_playlist_tracks[track_index].track.analysis = state.analysis_buffer[track_index];
+    }
+
   }
 }
 

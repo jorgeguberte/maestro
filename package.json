@@ -7,7 +7,9 @@
     "dev": "vite --port 3000",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest --dom"
+    "test": "vitest --dom",
+    "storybook": "SET NODE_OPTIONS=--openssl-legacy-provider && start-storybook -p 6006",
+    "build-storybook": "SET NODE_OPTIONS=--openssl-legacy-provider && build-storybook"
   },
   "dependencies": {
     "axios": "^1.1.2",
@@ -17,13 +19,23 @@
     "vue-router": "^4.1.5"
   },
   "devDependencies": {
+    "@babel/core": "^7.20.5",
+    "@storybook/addon-actions": "^6.5.14",
+    "@storybook/addon-essentials": "^6.5.14",
+    "@storybook/addon-interactions": "^6.5.14",
+    "@storybook/addon-links": "^6.5.14",
+    "@storybook/builder-vite": "^0.2.5",
+    "@storybook/testing-library": "^0.0.13",
+    "@storybook/vue3": "^6.5.14",
     "@vitejs/plugin-vue": "^3.1.0",
     "@vue/test-utils": "^2.1.0",
     "autoprefixer": "^10.4.12",
+    "babel-loader": "^8.3.0",
     "happy-dom": "^7.4.0",
     "postcss": "^8.4.18",
     "tailwindcss": "^3.1.8",
     "vite": "^3.1.0",
-    "vitest": "^0.24.0"
+    "vitest": "^0.24.0",
+    "vue-loader": "^16.8.3"
   }
 }
