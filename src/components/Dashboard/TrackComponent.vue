@@ -26,12 +26,26 @@
         <span class="font-normal">{{track.track.artists[0].name}}</span>
       </p>
     </div>
-    <div class="w-3/5 bg-blue-200">{{track.track.analysis}}</div>
+    <div class="w-3/5 bg-blue-200">{{track_key}}</div>
   </div>
 </template>
 
 <script setup>
-defineProps(["track"]);
+import {ref} from 'vue';
+import {useTrackKey} from '../../use/useAudioFeatures';
+
+
+
+const props = defineProps(["track"]);
+const track_key = ref(useTrackKey(props.track.track.analysis));
+
+
+//#TODO: Streamline track data to avoid track.track repetition
+//console.log(props.track.track.analysis)
+//const key = keys_table[props.track.track.analysis.key] + (props.track.track.analysis.mode == 1 ? '' : 'm');
+
+
+
 </script>
 
 <style scoped></style>
