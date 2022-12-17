@@ -2,6 +2,7 @@
 import Landing from './Landing.vue';
 import {useSpotifyStore} from "./stores/SpotifyAPI";
 
+
 export default{
   setup(){
     const spotifyStore = useSpotifyStore();

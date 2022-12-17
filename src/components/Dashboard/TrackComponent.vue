@@ -14,11 +14,11 @@
 
 <script setup>
 import {ref} from 'vue';
-import {useTrackKey, useTrackMood} from '../../use/useAudioFeatures';
+import {useTrackKey} from '../../use/useAudioFeatures';
 
 const props = defineProps(["track"]);
 const track_key = ref(useTrackKey(props.track.track.analysis));
-const track_mood = ref(useTrackMood(props.track.track.analysis))
+
 </script>
 
 <style scoped></style>
