@@ -206,6 +206,7 @@ function parentFunction(args){
 
 
 function sortPlaylist(args) {
+  console.log(args)
 
   
   const el = args.by;
@@ -226,23 +227,22 @@ function sortPlaylist(args) {
     //if the new element is added_at or default, then we need to sort by the date
     if(el == 'added_at' || el == 'default'){
       if(order == 'asc'){
-        state.selected_playlist_tracks = state.selected_playlist_tracks.sort((a, b) => (a.added_at > b.track.added_at ? 1 : -1));
+        state.selected_playlist_tracks = state.selected_playlist_tracks.sort((a,b) => (a.added_at > b.added_at) ? 1 : ((b.added_at > a.added_at) ? -1 : 0))
+        
       }else{
-        state.selected_playlist_tracks = state.selected_playlist_tracks.sort((a, b) => (a.added_at < b.track.added_at ? 1 : -1));
+        state.selected_playlist_tracks = state.selected_playlist_tracks.sort((a,b) => (a.added_at< b.added_at) ? 1 : ((b.added_at < a.added_at) ? -1 : 0))
       }
       
     }else{
       if(order == 'asc'){
         //if the new element is not added_at, then we need to sort by the value of the element
-      state.selected_playlist_tracks = state.selected_playlist_tracks.sort((a, b) => (a.track.analysis[el] > b.track.analysis[el] ? 1 : -1));
-      }else{
+      state.selected_playlist_tracks = state.selected_playlist_tracks.sort((a,b) => (a.track.analysis[el] > b.track.analysis[el]) ? 1 : ((b.track.analysis[el] > a.track.analysis[el]) ? -1 : 0))
         //if the new element is not added_at, then we need to sort by the value of the element
-      state.selected_playlist_tracks = state.selected_playlist_tracks.sort((a, b) => (a.track.analysis[el] < b.track.analysis[el] ? 1 : -1));
-      }
+      //state.selected_playlist_tracks = state.selected_playlist_tracks.sort((a,b) => (a.track.analysis[el] < b.track.analysis[el]) ? 1 : ((b.track.analysis[el ]< a.track.analysis[el]) ? -1 : 0))
       
     }
   }
-  
+}
   //console.log(el, order)
 
       //state.selected_playlist_tracks = state.selected_playlist_tracks.sort((a, b) => (a.track.added_at > b.track.added_at ? 1 : -1));
