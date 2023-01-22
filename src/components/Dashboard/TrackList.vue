@@ -51,7 +51,20 @@ function sortPlaylist(by){
 </script>
 
 <template>
-  <button @click="sortPlaylist('default')">Sort</button>
+  <div class="tracklist-wrapper">
+    <div class="tracklist-sorting-controls  flex flex-row w-full">
+      <div class="bg-red-300 w-4/5 pl-2 pr-2">Sort by Default</div>
+      <div class="flex text-xs bg-red-500 w-1/5 -ml-1">
+      <div class="w-1/3">Key</div>
+      <div class="w-1/3">Tempo</div>
+      <div class="w-1/3">Mood</div>
+    </div>
+    </div>
+    <ul class="w-full">
+      <TrackComponent v-for="track in props.tracks" :key="track.id" :track="track" />
+    </ul>
+  </div>
+<!--
   <ul class="mb-5 pt-5">
     <div class="flex bg-red-200 flex-col ml-3 mr-3 items-end">
       <div class="w-1/5 bg-blue-200 flex flex-row text-center">
@@ -61,7 +74,11 @@ function sortPlaylist(by){
       </div>
     </div>
     <TrackComponent v-for="track in props.tracks" :key="track.id" :track="track" />
-  </ul>
+  </ul>-->
 </template>
 
-<style lang="scss" scoped></style>
+<style scoped>
+.tracklist-wrapper{
+  @apply flex flex-col justify-center  items-center
+}
+</style>

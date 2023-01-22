@@ -1,5 +1,5 @@
 <template>
-  <div class="flex pl-3 pr-3 pt-1 pb-1 group">
+  <div class="flex pr-2 pl-2 pt-1 pb-1 group w-full">
     <div class="w-4/5  bg-neutral-100 group-hover:bg-neutral-200 flex">
       <img :src="track.track.album.images[0].url" class="w-12 h-12" />
       <p class="font-semibold ml-2">
