@@ -46,6 +46,12 @@ const routes = [
     component: () => import("../views/DashboardView.vue"),
   },
 
+  {
+    path: "/newdashboard",
+    name: "NewDashboard",
+    component: () => import("../views/NewDashboardView.vue"),
+  },
+
 
 ];
 
@@ -116,7 +122,12 @@ router.beforeEach((to, from, next) => {
       }else{
         next({name: "Login"});
       }
-      break;  
+      break;
+      
+    case "NewDashboard":
+      next();
+      break;
+      
     default:
       console.log("Figure it out");
       console.log(to.name);

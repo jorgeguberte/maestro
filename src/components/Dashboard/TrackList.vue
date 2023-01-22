@@ -47,17 +47,24 @@ function sortPlaylist(by){
   
 }
 
+function isSortingBy(property){
+  return playlist_sorting.by == property
+}
 
+function isSortingOrder(order){
+  return playlist_sorting.order == order
+}
 </script>
 
 <template>
   <div class="tracklist-wrapper">
+
     <div class="tracklist-sorting-controls  flex flex-row w-full">
-      <div class="bg-red-300 w-4/5 pl-2 pr-2">Sort by Default</div>
-      <div class="flex text-xs bg-red-500 w-1/5 -ml-1">
-      <div class="w-1/3">Key</div>
-      <div class="w-1/3">Tempo</div>
-      <div class="w-1/3">Mood</div>
+      <div class="w-4/5 pl-2 pr-2">Sort by Default</div>
+      <div class="flex text-xs  w-1/5 -ml-1">
+      <div @click="sortPlaylist('key')" class="tracklist-details-column-header" :class="{'active-sorting':isSortingBy('key')}">Key<i v-show="isSortingBy('key')" :class="{'fa-sort-up': isSortingOrder(true), 'fa-sort-down': isSortingOrder(false)}" class="fa-solid pl-1 text-xs text-neutral-600 cursor-pointer"></i></div>
+      <div @click="sortPlaylist('tempo')" class="tracklist-details-column-header" :class="{'active-sorting':isSortingBy('tempo')}" >Tempo<i v-show="isSortingBy('tempo')" :class="{'fa-sort-up': isSortingOrder(true), 'fa-sort-down': isSortingOrder(false)}" class="fa-solid pl-1 text-xs text-neutral-600 cursor-pointer"></i></div>
+      <div @click="sortPlaylist('mood')" class="tracklist-details-column-header" :class="{'active-sorting':isSortingBy('mood')}">Mood<i v-show="isSortingBy('mood')" :class="{'fa-sort-up': isSortingOrder(true), 'fa-sort-down': isSortingOrder(false)}" class="fa-solid pl-1 text-xs text-neutral-600 cursor-pointer"></i></div>
     </div>
     </div>
     <ul class="w-full">
@@ -80,5 +87,20 @@ function sortPlaylist(by){
 <style scoped>
 .tracklist-wrapper{
   @apply flex flex-col justify-center  items-center
+}
+.tracklist-details-column-header{
+  @apply w-1/3 flex justify-center place-items-center pb-1 hover:bg-gray-200 hover:cursor-pointer
+}
+
+.active-sorting{
+  @apply text-red-400
+}
+
+.sort-up{
+  @apply bg-green-200
+}
+
+.sort-down{
+  @apply bg-yellow-200
 }
 </style>
