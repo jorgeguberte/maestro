@@ -1,28 +1,22 @@
 <template>
-  <div class="flex pr-2 pl-2 pt-1 pb-1 group w-full">
-    <div class="w-4/5  bg-neutral-100 group-hover:bg-neutral-200 flex">
-      <img :src="track.track.album.images[0].url" class="w-12 h-12" />
-      <p class="font-semibold ml-2">
+<div class="flex bg-white group hover:bg-neutral-200">
+<div class="flex w-4/5 pt-2 pb-2">
+  <div class="w-1/12 flex place-content-center">
+    <img :src="track.track.album.images[0].url" class="w-12 h-12" />
+  </div>
+  <div class="w-11/12">
+    <p class="font-semibold ml-2">
         {{track.track.name}}<br>
         <span class="font-normal">{{track.track.artists[0].name}}</span>
       </p>
-    </div>
-    <!--<div class="w-2/5 bg-blue-200">{{track_key}} <i class="fa-solid fa-spinner animate-spin" v-if="!track.track.analysis.mood"></i><span v-else>{{track.track.analysis.mood}}</span></div>-->
-    <div class="w-1/5 bg-neutral-200  group-hover:bg-neutral-300 flex place-items-center flex-row">
-      <div class="flex flex-col p-2 text-center w-1/3">
-        <div>{{useTrackKey(props.track.track.analysis)}}</div>
-        <div class="text-xs">Key</div>
-      </div>
-      <div class="flex flex-col p-2 text-center w-1/3">
-        <div>{{Math.ceil(track.track.analysis.tempo)}}</div>
-        <div class="text-xs">BPM</div>
-      </div>
-      <div class="flex flex-col p-2 text-center w-1/3">
-        <div class="text-xs">{{track.track.analysis.mood}}</div>
-        <div class="text-xs">Mood</div>
-      </div>
-    </div>
   </div>
+</div>
+<div class="w-1/5  flex flex-row divide-x divide-neutral-200 group-hover:divide-zinc-200">
+  <div class="track-detail-cell text-sm">{{useTrackKey(props.track.track.analysis)}}</div>
+  <div class="track-detail-cell text-sm">{{Math.ceil(track.track.analysis.tempo)}}</div>
+  <div class="track-detail-cell text-xs">{{track.track.analysis.mood}}</div>
+</div>
+</div>
 </template>
 
 
@@ -35,4 +29,8 @@ const track_key = ref(useTrackKey(props.track.track.analysis));
 
 </script>
 
-<style scoped></style>
+<style scoped>
+.track-detail-cell{
+  @apply w-1/3 flex justify-center place-items-center bg-neutral-100  group-hover:bg-neutral-300
+}
+</style>

@@ -59,29 +59,22 @@ function isSortingOrder(order){
 <template>
   <div class="tracklist-wrapper">
 
-    <div class="tracklist-sorting-controls  flex flex-row w-full">
-      <div class="w-4/5 pl-2 pr-2">Sort by Default</div>
-      <div class="flex text-xs  w-1/5 -ml-1">
-      <div @click="sortPlaylist('key')" class="tracklist-details-column-header" :class="{'active-sorting':isSortingBy('key')}">Key<i v-show="isSortingBy('key')" :class="{'fa-sort-up': isSortingOrder(true), 'fa-sort-down': isSortingOrder(false)}" class="fa-solid pl-1 text-xs text-neutral-600 cursor-pointer"></i></div>
-      <div @click="sortPlaylist('tempo')" class="tracklist-details-column-header" :class="{'active-sorting':isSortingBy('tempo')}" >Tempo<i v-show="isSortingBy('tempo')" :class="{'fa-sort-up': isSortingOrder(true), 'fa-sort-down': isSortingOrder(false)}" class="fa-solid pl-1 text-xs text-neutral-600 cursor-pointer"></i></div>
-      <div @click="sortPlaylist('mood')" class="tracklist-details-column-header" :class="{'active-sorting':isSortingBy('mood')}">Mood<i v-show="isSortingBy('mood')" :class="{'fa-sort-up': isSortingOrder(true), 'fa-sort-down': isSortingOrder(false)}" class="fa-solid pl-1 text-xs text-neutral-600 cursor-pointer"></i></div>
+    <div class="tracklist-sorting-controls  flex flex-row w-full  ">
+      <div class="w-4/5 pl-4 text-sm flex justify-left place-items-center">Click on a column to sort</div>
+      <div class="w-1/5 bg-neutral-200 flex text-xs">
+        <div class="sorting-column-header-cell" :class="{'active-sorting':isSortingBy('key')}"  @click="sortPlaylist('key')">Key<i v-show="isSortingBy('key')" :class="{'fa-sort-up': isSortingOrder(true), 'fa-sort-down': isSortingOrder(false)}" class="fa-solid pl-1 text-xs text-neutral-600 cursor-pointer"></i></div>
+        <div class="sorting-column-header-cell" :class="{'active-sorting':isSortingBy('tempo')}" @click="sortPlaylist('tempo')">Tempo<i v-show="isSortingBy('tempo')" :class="{'fa-sort-up': isSortingOrder(true), 'fa-sort-down': isSortingOrder(false)}" class="fa-solid pl-1 text-xs text-neutral-600 cursor-pointer"></i></div>
+        <div class="sorting-column-header-cell" :class="{'active-sorting':isSortingBy('mood')}" @click="sortPlaylist('mood')">Mood<i v-show="isSortingBy('mood')" :class="{'fa-sort-up': isSortingOrder(true), 'fa-sort-down': isSortingOrder(false)}" class="fa-solid pl-1 text-xs text-neutral-600 cursor-pointer"></i></div>
+      </div>
+
     </div>
-    </div>
-    <ul class="w-full">
+
+
+    <ul class="w-full  flex flex-col gap-1">
       <TrackComponent v-for="track in props.tracks" :key="track.id" :track="track" />
     </ul>
   </div>
-<!--
-  <ul class="mb-5 pt-5">
-    <div class="flex bg-red-200 flex-col ml-3 mr-3 items-end">
-      <div class="w-1/5 bg-blue-200 flex flex-row text-center">
-        <p class="w-1/3">Key<i class="fa-solid fa-sort pl-1 text-xs text-neutral-600 cursor-pointer" @click="sortPlaylist('key')"></i></p>
-        <p class="w-1/3">Tempo<i class="fa-solid fa-sort pl-1 text-xs text-neutral-600 cursor-pointer" @click="sortPlaylist('tempo')"></i></p>
-        <p class="w-1/3">Mood<i class="fa-solid fa-sort pl-1 text-xs text-neutral-600 cursor-pointer" @click="sortPlaylist('mood')"></i></p>
-      </div>
-    </div>
-    <TrackComponent v-for="track in props.tracks" :key="track.id" :track="track" />
-  </ul>-->
+
 </template>
 
 <style scoped>
@@ -93,7 +86,7 @@ function isSortingOrder(order){
 }
 
 .active-sorting{
-  @apply text-red-400
+  @apply bg-neutral-400 text-white
 }
 
 .sort-up{
@@ -102,5 +95,9 @@ function isSortingOrder(order){
 
 .sort-down{
   @apply bg-yellow-200
+}
+
+.sorting-column-header-cell{
+@apply w-1/3 flex justify-center place-items-center text-sm pt-1 pb-2 hover:bg-zinc-400 hover:text-white  cursor-pointer
 }
 </style>
