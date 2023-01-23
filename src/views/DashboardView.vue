@@ -27,6 +27,7 @@ const state = reactive({
   analysis_buffer: [],
   analysis_args: "",
   sorting: { by: "default", order: "default" }, //default order. probably by date_added desc
+  tracklist_shrink: false
 });
 
 //Data provided to the child components
@@ -251,6 +252,28 @@ function sortPlaylist(args) {
   //Change state of the sort order
   state.sorting = { by: el, order: order };
 }
+
+
+onMounted(async()=>{
+  const el  = document.getElementsByClassName('dashboard__content')[0];
+
+  el.addEventListener('scroll', (evt) => {
+    let targetElement = document.getElementsByClassName('tracklist-wrapper')[0];
+    let targetElement_top = targetElement.getBoundingClientRect().top;
+    if(targetElement_top <= 0 && state.tracklist_shrink == false){
+      state.tracklist_shrink = true;
+    }
+
+    if(targetElement_top >0){
+      state.tracklist_shrink = false;
+    }
+
+
+  });
+
+})
+
+
 </script>
 
 <template>
@@ -259,6 +282,7 @@ function sortPlaylist(args) {
       :user="state.user"
       :playlists="state.playlists"
       @selectPlaylist="(playlist_id) => selectPlaylist(playlist_id)"
+
     />
 
     <div class="dashboard__content">
@@ -272,7 +296,7 @@ function sortPlaylist(args) {
       </div>
 
       <div v-if="state.selected_playlist">
-        <div class="flex border-b bg-white pl-12 pt-14 pb-12 sticky top-0">
+<!--        <div class="flex border-b bg-white pl-12 pt-14 pb-12 sticky -top-10">-->
           <PlaylistHeader
             :img_url="state.selected_playlist.images[0].url"
             :playlist_name="state.selected_playlist.name"
@@ -280,11 +304,12 @@ function sortPlaylist(args) {
             :playlist_total_tracks="state.selected_playlist.tracks.total"
             :playlist_description="state.selected_playlist.description"
             :analysis_status="state.analysis_status"
+            :shrink="state.tracklist_shrink"
           />
-        </div>
+        <!--</div>-->
 
         <!--Tracklist-->
-        <TrackList :tracks="state.selected_playlist_tracks" @sortPlaylist="sortPlaylist"/>
+        <TrackList :tracks="state.selected_playlist_tracks" @sortPlaylist="sortPlaylist" id="trackList"/>
       </div>
     </div>
   </div>

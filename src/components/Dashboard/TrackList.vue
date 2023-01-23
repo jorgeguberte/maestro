@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import TrackComponent from "./TrackComponent.vue";
 import { usePlaylistStore } from "../../stores/PlaylistsStore";
-import { onBeforeMount } from "vue";
+import { onBeforeMount, onMounted , watch, reactive} from "vue";
 
 import { classifyTrack } from "../../use/useTrackClassifier";
 
@@ -22,6 +22,17 @@ onBeforeMount(async () => {
   tracksClassified.value = true;
   
 });
+
+onMounted(async()=>{
+  const el = document.getElementsByClassName('tracklist-wrapper')[0];
+
+  const rect =ref(el.getBoundingClientRect().top);
+  
+
+  watch(rect, (newVal, oldVal)=>{
+    console.log('cxhanged')
+  })
+})
 
 const playlist_sorting = ref({by:'default', order: true});
 
