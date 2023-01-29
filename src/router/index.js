@@ -46,11 +46,6 @@ const routes = [
     component: () => import("../views/DashboardView.vue"),
   },
 
-  {
-    path: "/newdashboard",
-    name: "NewDashboard",
-    component: () => import("../views/NewDashboardView.vue"),
-  },
 
 
 ];
