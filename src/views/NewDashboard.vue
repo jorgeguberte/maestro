@@ -7,12 +7,22 @@
                 <p>Choose a playlist below</p>
             </div>
             <div class="sidebar-playlist-container">
-                <ul class="h-full">
-                    <li v-for="i in 100">sasa</li>
+                <div class="h-fit">
+                    <!--<ul class="h-full flex overflow-x-clip md:flex-col">
+                    <li v-for="i in 50">
+                        <div>{{i}}</div>
+                    </li>
+                </ul>-->
+                <ul>
+                    <li v-for="x in 100">{{ x }}</li>
                 </ul>
+                </div>
             </div>
         </div>
-        <div class="content"><h1>Content</h1></div>
+        <div class="content">
+            <h1>Content</h1>
+            <p v-for="x in 200">{{x}}</p>
+        </div>
     </div>
 </template>
 
@@ -28,17 +38,21 @@ const isMobile = breakpoints.smallerOrEqual('md');
 
 <style scoped>
 .dashboard{
-    @apply bg-neutral-200 md:bg-emerald-200 h-screen overflow-y-scroll;
+    @apply bg-neutral-200 md:bg-emerald-200 h-screen;
     @apply flex flex-col md:flex-row;
 }
 .sidebar{
-    @apply w-full md:w-1/3 lg:w-1/4 h-1/6 md:h-screen overflow-hidden bg-red-200
+    @apply  md:w-1/3 lg:w-1/4 h-1/6 md:h-screen overflow-hidden bg-red-200;
 }
 
 .sidebar-lid{
-    @apply bg-blue-200 p-3
+    @apply bg-blue-200 p-3 ;
 }
 .sidebar-playlist-container{
     @apply h-full overflow-y-scroll
+}
+
+.content{
+    @apply h-full w-full overflow-y-scroll;
 }
 </style>
