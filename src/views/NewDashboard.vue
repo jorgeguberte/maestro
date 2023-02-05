@@ -17,11 +17,13 @@
 
 .content{
   @apply bg-slate-400;
-  @apply row-span-6
+  @apply row-span-6;
+  @apply lg:col-span-8
 }
 .sidebar{
   @apply  bg-slate-200  ;
   @apply order-last lg:order-first;
   @apply h-full lg:h-screen;
+  @apply lg:col-span-2
 }
 </style>
