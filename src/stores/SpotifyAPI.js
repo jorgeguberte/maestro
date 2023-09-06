@@ -16,8 +16,8 @@ export const useSpotifyStore = defineStore('spotify', {
     },
     actions: {
         getAuthURL(){
-            const client_id = import.meta.env.VITE_CLIENT_ID;
-            const redirect_uri = import.meta.env.VITE_REDIRECT_URI;
+            const client_id = '';
+            const redirect_uri = '';
             const scope = 'playlist-read-private user-read-private user-read-email';
             let url = 'https://accounts.spotify.com/authorize'
             url += '?response_type=token'
