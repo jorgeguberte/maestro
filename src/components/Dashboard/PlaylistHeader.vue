@@ -9,10 +9,12 @@ defineProps(['img_url', 'playlist_name', 'playlist_owner', 'playlist_total_track
 
 <template>
   
-  <div class="flex flex-row w-full pt-14 pb-12 sticky -top-5 pl-3 transition-all" :class="{'bg-red-200':!shrink, 'bg-green-200':shrink}">
-    <img :src="img_url" :class="{'w-40':!shrink, 'h-40':!shrink, 'w-20':shrink, 'h-20':shrink}" class="transition-all"/>
-    <h1>{{ playlist_name }}</h1>
-    <p>{{ playlist_owner }}</p>
+  <div class="playlist-header flex flex-row w-full pt-14 pb-12 sticky -top-5 pl-3 transition-all" :class="{'bg-red-200':!shrink, 'bg-green-200':shrink}">
+    <img :src="img_url" :class="{'w-40':!shrink, 'h-40':!shrink, 'w-20':shrink, 'h-20':shrink}" class="rounded-full shadow-lg transition-all"/>
+    <div class="playlist-info ml-4">
+      <h1 class="text-3xl font-bold">{{ playlist_name }}</h1>
+      <p class="text-gray-500">{{ playlist_owner }}</p>
+    </div>
   </div>
   
   
@@ -61,5 +63,16 @@ defineProps(['img_url', 'playlist_name', 'playlist_owner', 'playlist_total_track
 }
 .height-wrapper-shrunk{
   @apply pt-4 pb-4 pl-4
+}
+
+.playlist-header {
+  background-color: #F5F5F5;
+  border-bottom: 1px solid #E5E5E5;
+}
+
+.playlist-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 </style>
