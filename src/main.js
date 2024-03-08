@@ -26,7 +26,6 @@ const firebaseConfig = {
 
 const firebaseApp = initializeApp(firebaseConfig);
 
-console.log(import.meta.env.VITE_FIREBASE_PROJECT_ID);
 const pinia = createPinia()
 const app = createApp(App)
 const analytics = getAnalytics(firebaseApp);
