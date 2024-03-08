@@ -7,8 +7,7 @@ function isTokenValid() {
 }
 
 function hasLocalToken() {
-  //return localStorage.getItem("token") != null;
-  const local_token = localStorage.getItem("token");
+  const local_token = sessionStorage.getItem("token");
   if (!local_token) {
     console.log('No local token')
     return false;
@@ -17,7 +16,7 @@ function hasLocalToken() {
 
     const now = Date.parse(new Date());
     if (now > token.valid_until) {
-      localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
       console.log('Token expired')
       return false;
     } else {
@@ -43,7 +42,7 @@ const routes = [
   {
     path: "/dashboard",
     name: "Dashboard",
-    component: () => import("../views/DashboardView.vue"),
+    component: () => import("../views/NewDashboard.vue"),
   },
 
 
@@ -101,7 +100,7 @@ router.beforeEach((to, from, next) => {
           valid_until: Date.parse(expiration_date),
           state: query_params.state,
         }
-        localStorage.setItem("token", JSON.stringify(token));
+        sessionStorage.setItem("token", JSON.stringify(token));
         next('/dashboard');
       }else{
         console.log('No hash. Redirect to login');
@@ -124,7 +123,7 @@ router.beforeEach((to, from, next) => {
       break;
       
     default:
-      console.log("Figure it out");
+      console.log("Default switch case."); //#NOTE: Possible edge case
       console.log(to.name);
   }
 });

@@ -28,7 +28,7 @@ export const useSpotifyStore = defineStore('spotify', {
             return url;
         },
         async setToken(){
-            this.token = JSON.parse(localStorage.getItem('token'));//Retrieve token from local storage
+            this.token = JSON.parse(sessionStorage.getItem('token'));//Retrieve token from local storage
             
 
             axios.defaults.headers.common = {'Authorization': `Bearer ${this.token.access_token}`}
@@ -40,11 +40,11 @@ export const useSpotifyStore = defineStore('spotify', {
         },
 
         async getLocalStorage(){
-            this.token = JSON.parse(localStorage.getItem('token'));
-            this.user = JSON.parse(localStorage.getItem('user'));
+            this.token = JSON.parse(sessionStorage.getItem('token'));
+            this.user = JSON.parse(sessionStorage.getItem('user'));
         },
         async hasLocalToken(){
-            const local_token = localStorage.getItem('token');
+            const local_token = sessionStorage.getItem('token');
             console.log(local_token)
         },
 
@@ -66,7 +66,7 @@ export const useSpotifyStore = defineStore('spotify', {
     
         async setUser(user_data){
             this.user = user_data;
-            localStorage.setItem('user', JSON.stringify(this.user));
+            sessionStorage.setItem('user', JSON.stringify(this.user));
 
         },
 
