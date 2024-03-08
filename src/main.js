@@ -9,8 +9,7 @@ import { createPinia } from 'pinia';
 //import './style.css'
 import './index.css'
 import App from './App.vue'
-import DummyComponent from './components/DummyComponent.vue';
-import CallbackView from './views/CallbackView.vue';
+
 
 
 
@@ -27,7 +26,7 @@ const firebaseConfig = {
 
 const firebaseApp = initializeApp(firebaseConfig);
 
-
+console.log(import.meta.env.VITE_FIREBASE_PROJECT_ID);
 const pinia = createPinia()
 const app = createApp(App)
 const analytics = getAnalytics(firebaseApp);
