@@ -1,6 +1,28 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 
+/**
+* ⚠️ WARNING
+* @author: @jorgeguberte
+* @date: 2024-03-13T02:15:00.000Z (ISO 8601)
+* Metadata:
+* - component: index.ks
+* - change: none
+* - reason: non-applicable
+*
+* Description:
+* The token check below has been deprecated and the token is now checked in NewDashboard.vue::storeToken().
+*
+* Potential Problems:
+* - Token freshness: the new check uses different naming conventions and is not yet implemented.
+* 
+* Solution:
+* - Homogenize the token check, adopting what's in NewDashboard.vue::storeToken().
+*
+* Improvement:
+* - Visual map of routes, kinda like Swagger does for APIs. #insight #idea
+*
+**/
 function isTokenValid() {
   //Check date
   return true;
@@ -30,7 +52,7 @@ const routes = [
   {
     path: "/",
     name: "Home",
-    component: () => import("../Landing.vue"),
+    component: () => import("../views/NewDashboard.vue"),
   },
   { path: "/login", name: "Login", component: () => import("../Landing.vue") },
   {
