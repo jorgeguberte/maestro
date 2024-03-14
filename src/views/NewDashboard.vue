@@ -24,6 +24,7 @@ const query = ref(''); //Holds query string
 const results = ref([]); //Holds results from the search
 const selectedResult = ref(null); //Holds the result selected by the user
 
+
 const emit = defineEmits(['selectTrack']);
 
 function storeToken(data) {
@@ -89,6 +90,7 @@ async function search(){
         'Authorization': 'Bearer ' + token
       }
     });
+
     if(!response.ok){
       console.error("Show error message")
       return;
@@ -105,25 +107,111 @@ async function search(){
   })
 }
 
-function selectTrack(track){
-  console.log('')
+
+
+
+
+
+
+
+
+
+
+
+
+async function selectTrack(track){
   selectedResult.value = track;
+  await getSpotifyToken()
+  .then(async (token)=>{
+    const response = await fetch (`https://api.spotify.com/v1/tracks/${track.id}`, {method:'GET', headers:{'Authorization':'Bearer '+token}});
+    if(!response.ok){
+      console.log("NOT OK");
+      selectedResult.value = null;
+      return;
+    }else{
+      const data = await response.json();
+      selectedResult.value = data;
+      /*
+      * At this point the track is selected but not yet analyzed, 
+      * so we need to display the basic info and a loader while we fetch the audio features.
+      */
+     analyzeTrack();
+    }
+  })
+}
+
+
+
+async function analyzeTrack(){
+  // Check if track is actually selected
+  if(!selectedResult.value) return;
+  // Fetch audio features
+  await getSpotifyToken()
+  .then(async (token)=>{
+    const response = await fetch (`https://api.spotify.com/v1/audio-features/${selectedResult.value.id}`, {method:'GET', headers:{'Authorization':'Bearer '+token}});
+    if(!response.ok){
+      console.log("NOT OK");
+      return;
+    }else{
+      const data = await response.json();
+      console.log(data);
+    }
+  });
   //
-} 
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <template>
     <div id="app" class="container mx-auto w-screen h-screen bg-red-200 flex flex-col">
       <header class="sticky top-0 z-10 p-4 bg-blue-200 h-fit text-center"> <h1 class="text-2xl font-bold">Maestro</h1>
         <p class="text-gray-600">Lorem ipsum dolor sit amet...</p> 
         <p v-if="selectedResult">{{selectedResult.id}}</p>
-    </header>
-    <div class="sticky top-16 p-4 text-center">
+      </header>
+      <!-- SearchBar -->
+      <div class="sticky top-16 p-4 text-center">
       <input v-model="query" type="text" placeholder="Search for a song on Spotify">
       <button @click="search">Search</button>
     </div>
-    <div class=" overflow-y-auto max-h-[calc(100vh-12rem)] bg-orange-300 w-[screen]"><!-- results wrapper-->
+
+    <!--SEARCH RESULTS-->
+    <div v-if="results.length > 0 && !selectedResult" class=" overflow-y-auto max-h-[calc(100vh-12rem)] bg-orange-300 w-[screen]"><!-- results wrapper-->
       <div v-for="track in results" :key="track.id" class="w-full p-2 flex items-center gap-4 border cursor-pointer hover:bg-gray-100" @click="selectTrack(track)">
         <img  :src="track.album.images[2].url" alt="Album cover" class="w-16 h-16">
         <div>
@@ -132,8 +220,8 @@ function selectTrack(track){
           <p>{{track.album.name}}</p>
         </div>
       </div>
-
     </div>
+
 
 
 
