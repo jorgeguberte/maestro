@@ -24,7 +24,7 @@ const query = ref(''); //Holds query string
 const results = ref([]); //Holds results from the search
 const selectedResult = ref(null); //Holds the result selected by the user
 const isTrackLoading = ref(false); //Holds the state of the track loading
-
+const isSearching = ref(false); //Holds the state of the search
 
 const emit = defineEmits(['selectTrack']);
 
@@ -78,6 +78,7 @@ async function getSpotifyToken(){
 
 async function search(){
   if(!query.value) return;  
+  isSearching.value = true;
   //Format query string
   const encodedQuery = query.value.replace(' ', '%20');
 
@@ -105,6 +106,7 @@ async function search(){
 
 
     }
+    isSearching.value = false;
   })
 }
 
@@ -139,6 +141,7 @@ async function selectTrack(track){
       */
      analyzeTrack();
     }
+    isTrackLoading.value = false;
   })
 }
 
@@ -204,13 +207,13 @@ async function analyzeTrack(){
     <div id="app" class="container mx-auto w-screen h-screen bg-red-200 flex flex-col">
       <header class="sticky top-0 z-10 p-4 bg-blue-200 h-fit text-center"> <h1 class="text-2xl font-bold">Maestro</h1>
         <p class="text-gray-600">Lorem ipsum dolor sit amet...</p> 
-        <p v-if="selectedResult">{{selectedResult.id}}</p>
       </header>
       <!-- SearchBar -->
       <div class="sticky top-16 p-4  flex items-center justify-center">
-        <p class="mr-4" v-show="isTrackLoading==true">loading</p>
-      <input class="mr-4 h-8" v-model="query" type="text" placeholder="Search for a song on Spotify">
-      <button class="bg-emerald-300" @click="search">Search</button>
+        
+      <input class="input" v-model="query" type="text" placeholder="Search for a song on Spotify">
+      <button class="btn btn-primary ml-2" @click="search">Search</button>
+      <span v-show="isTrackLoading==true || isSearching==true" class="loading loading-dots loading-sm ml-2"></span>
     </div>
 
     <!--SEARCH RESULTS-->
@@ -224,6 +227,8 @@ async function analyzeTrack(){
         </div>
       </div>
     </div>
+
+    <div v-if="selectedResult && !isTrackLoading">has result</div>
 
 
 
