@@ -23,6 +23,7 @@ import { ref } from 'vue';
 const query = ref(''); //Holds query string
 const results = ref([]); //Holds results from the search
 const selectedResult = ref(null); //Holds the result selected by the user
+const isTrackLoading = ref(false); //Holds the state of the track loading
 
 
 const emit = defineEmits(['selectTrack']);
@@ -120,6 +121,7 @@ async function search(){
 
 
 async function selectTrack(track){
+  isTrackLoading.value = true;
   selectedResult.value = track;
   await getSpotifyToken()
   .then(async (token)=>{
@@ -205,9 +207,10 @@ async function analyzeTrack(){
         <p v-if="selectedResult">{{selectedResult.id}}</p>
       </header>
       <!-- SearchBar -->
-      <div class="sticky top-16 p-4 text-center">
-      <input v-model="query" type="text" placeholder="Search for a song on Spotify">
-      <button @click="search">Search</button>
+      <div class="sticky top-16 p-4  flex items-center justify-center">
+        <p class="mr-4" v-show="isTrackLoading==true">loading</p>
+      <input class="mr-4 h-8" v-model="query" type="text" placeholder="Search for a song on Spotify">
+      <button class="bg-emerald-300" @click="search">Search</button>
     </div>
 
     <!--SEARCH RESULTS-->
