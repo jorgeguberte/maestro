@@ -1,5 +1,21 @@
 <script setup>
 import { ref } from 'vue';
+
+import {collection, addDoc} from 'firebase/firestore';
+import db from '../helpers/firebase/init.js';
+
+/*try{
+  const docRef = await addDoc(collection(db, "users"), {
+    first: "Ada",
+    last: "Lovelace",
+    born: 1815
+  });
+  console.log("Document written with ID: ", docRef.id);
+}catch(e){
+  console.error(e);
+}*/
+
+
 //import { useSpotifyStore } from '../stores/SpotifyAPI';
 /**
 * ⚠️ WARNING
@@ -100,6 +116,8 @@ async function search(){
       const data = await response.json();
       if(data.tracks.items.length > 0){
         results.value = data.tracks.items;
+        console.log(data.tracks.items[0]);
+        
       }else{
         console.error("No results found");
       }
