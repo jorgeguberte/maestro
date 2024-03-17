@@ -67,6 +67,12 @@ const routes = [
     component: () => import("../views/NewDashboard.vue"),
   },
 
+  {
+    path: '/labeler',
+    name: "Labeler",
+    component: ()=> import("../views/Labeler.vue")
+  }
+
 
 
 ];
@@ -141,6 +147,9 @@ router.beforeEach((to, from, next) => {
       break;
       
     case "NewDashboard":
+      next();
+      break;
+    case "Labeler":
       next();
       break;
       
