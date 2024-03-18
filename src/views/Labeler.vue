@@ -1,29 +1,58 @@
 <script setup>
-    import { ref, onBeforeMount} from 'vue';
-    
+    import { ref, onBeforeMount, onMounted} from 'vue';
+    import TrackCardLabeler from '../components/TrackCardLabeler.vue';
     //Firebase and Firestore
-    import {collection, addDoc, getDocs} from 'firebase/firestore';
+    import {collection, query, limit, where, addDoc, getDocs, doc, updateDoc} from 'firebase/firestore';
     import db from '../helpers/firebase/init.js';
 
 
     import audioFeatures from '../assets/audio_features.json';
-    const availableLabels = ref(['Happy','Sad']);
+    const availableLabels = ref(['Upbeat','Cheerful','Calm','Meditative']);
     const isPopulating = ref(false);
     const isPopulated = ref(false);
     const loadingPop = ref(true);
     const currentIdx = ref(0);
+    const currentTracks = ref([]);
 
     onBeforeMount(async () => {
         //Check firestore if the database is already populated
-        const querySnapshot = await getDocs(collection(db, "audio_features"),{ limit: 10});
+        const querySnapshot = await getDocs(collection(db, "audio_features"),{ limit: 1});
         if(querySnapshot.size > 0) {
             isPopulated.value = true;
-            //isPopulated.value = true;
         }else{
             isPopulated.value = false;
         }
         loadingPop.value = false;
     });
+
+    onMounted(async () => {
+        /*const tracksRef = collection(db, "audio_features");
+        const q = query(tracksRef, where("label.mood", "==", ""), limit(10));
+
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+            currentTracks.value.push(doc.data());
+        });*/
+        await fetchNewTrackPage();
+    });
+
+    async function fetchNewTrackPage(){
+        const tracksRef = collection(db, "audio_features");
+        const q = query(tracksRef, where("label.mood", "==", ""), limit(10));
+
+        const querySnapshot = await getDocs(q);
+        if(querySnapshot.size > 0) {
+            querySnapshot.forEach((doc) => {
+                let track = {docId: doc.id, ...doc.data()};
+                currentTracks.value.push(track);
+            });
+            console.log(currentTracks.value)
+        }else{
+            console.log('No more tracks to label');
+            return;
+        }
+        
+    }
 
 
     async function populateDB() {
@@ -36,7 +65,7 @@
                     newTrack[key] = track[key];
                 }
             }
-
+            newTrack['label'] = {mood: ''};
             //Try to add the track to the database
             try {
                 const docRef = await addDoc(collection(db, "audio_features"), newTrack);
@@ -46,24 +75,28 @@
                 console.error("Error adding document: ", e);
             }
 
-
-            //currentIdx.value++;
-
-                /*const docRef = await addDoc(collection(db, "audio_features"), track);
-                console.log("Document written with ID: ", docRef.id);*/
-        
-
-            //Below, a placeholder for the actual process of adding the data to the database
-            /*await new Promise(resolve => setTimeout(resolve, 50));
-            if(currentIdx.value == audioFeatures.length) {
-                isPopulating.value = false;
-                isPopulated.value = true;
-            }*/
         }
         isPopulating.value = false;
         isPopulated.value = true;
 
 
+    }
+
+    async function assignMood(docId, mood) {
+        console.log('Assigning mood to track', docId, mood);
+        //Update the track in the database
+        const trackRef = doc(db, "audio_features", docId);
+        try{
+            await updateDoc(trackRef, { "label.mood": mood });
+            currentTracks.value = currentTracks.value.filter(track => track.docId !== docId);
+
+        }catch(e){
+            console.error("Error updating document: ", e);
+        }
+        //Remove the track from the currentTracks array
+        //currentTracks.value = currentTracks.value.filter(track => track.id !== trackId);
+        //Fetch a new page of tracks
+        //await fetchNewTrackPage();
     }
     
 </script>
@@ -91,6 +124,22 @@
             <div v-if="isPopulated" class="badge badge-success">Database Populated</div>
         </div>
     </div>
+
+    <div v-if="isPopulated && !isPopulating && !loadingPop" class="flex flex-col place-items-center space-y-4">
+      <TrackCardLabeler
+            v-for="track in currentTracks"
+            :key="track.id"
+            :docId="track.docId"
+            :trackId="track.id"
+            :trackName="track.name"
+            :artistName="track.artists[0].name"
+            :albumName="track.album.name"
+            :albumImage="track.album.images[1].url"
+            @assignMood="assignMood"
+            />
+    </div>
+
+    
 </div>
 </template>
 
