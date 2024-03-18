@@ -2,7 +2,7 @@
     import { ref, onBeforeMount, onMounted} from 'vue';
     import TrackCardLabeler from '../components/TrackCardLabeler.vue';
     //Firebase and Firestore
-    import {collection, query, limit, where, addDoc, getDocs, doc, updateDoc} from 'firebase/firestore';
+    import {collection, query, limit, startAfter, where, addDoc, getDocs, doc, updateDoc, orderBy} from 'firebase/firestore';
     import db from '../helpers/firebase/init.js';
 
 
@@ -33,23 +33,32 @@
         querySnapshot.forEach((doc) => {
             currentTracks.value.push(doc.data());
         });*/
-        await fetchNewTrackPage();
+        try{
+            const trackPage = await fetchNewTrackPage();
+            currentTracks.value = trackPage;
+        }catch(e){
+            console.error("Error fetching tracks: ", e);
+        }
+        
     });
 
-    async function fetchNewTrackPage(){
+    async function fetchNewTrackPage(trackLimit=10, trackOffset=0){
         const tracksRef = collection(db, "audio_features");
-        const q = query(tracksRef, where("label.mood", "==", ""), limit(10));
+        const q = query(tracksRef, where("label.mood", "==", ""), orderBy('popularity'), limit(trackLimit), startAfter(trackOffset));
 
         const querySnapshot = await getDocs(q);
         if(querySnapshot.size > 0) {
+            let newTracks = [];
             querySnapshot.forEach((doc) => {
                 let track = {docId: doc.id, ...doc.data()};
-                currentTracks.value.push(track);
+                newTracks.push(track);
+                //currentTracks.value.push(track);
             });
-            console.log(currentTracks.value)
+            return newTracks;
+            //console.log(currentTracks.value)
         }else{
             console.log('No more tracks to label');
-            return;
+            throw new Error('No more tracks to label')
         }
         
     }
@@ -81,7 +90,6 @@
 
 
     }
-
     async function assignMood(docId, mood) {
         console.log('Assigning mood to track', docId, mood);
         //Update the track in the database
@@ -89,6 +97,8 @@
         try{
             await updateDoc(trackRef, { "label.mood": mood });
             currentTracks.value = currentTracks.value.filter(track => track.docId !== docId);
+            const newTracks = await fetchNewTrackPage(10, 0);
+            currentTracks.value = newTracks;
 
         }catch(e){
             console.error("Error updating document: ", e);
