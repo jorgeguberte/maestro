@@ -2,65 +2,73 @@
     import { ref, onBeforeMount, onMounted} from 'vue';
     import TrackCardLabeler from '../components/TrackCardLabeler.vue';
     //Firebase and Firestore
-    import {collection, query, limit, startAfter, where, addDoc, getDocs, doc, updateDoc, orderBy} from 'firebase/firestore';
+    import {collection, query, limit, where, addDoc, getDocs, doc, updateDoc, orderBy, deleteDoc} from 'firebase/firestore';
     import db from '../helpers/firebase/init.js';
 
 
     import audioFeatures from '../assets/audio_features.json';
-    const availableLabels = ref(['Upbeat','Cheerful','Calm','Meditative']);
+
     const isPopulating = ref(false);
     const isPopulated = ref(false);
     const loadingPop = ref(true);
     const currentIdx = ref(0);
     const currentTracks = ref([]);
+    const localLabeledTracks = ref([]);
+    const userFeedback = ref(false);
+
+    const COLLECTION = collection(db, 'audio_features');
 
     onBeforeMount(async () => {
-        //Check firestore if the database is already populated
-        const querySnapshot = await getDocs(collection(db, "audio_features"),{ limit: 1});
-        if(querySnapshot.size > 0) {
-            isPopulated.value = true;
-        }else{
-            isPopulated.value = false;
-        }
-        loadingPop.value = false;
-    });
-
-    onMounted(async () => {
-        /*const tracksRef = collection(db, "audio_features");
-        const q = query(tracksRef, where("label.mood", "==", ""), limit(10));
-
-        const querySnapshot = await getDocs(q);
-        querySnapshot.forEach((doc) => {
-            currentTracks.value.push(doc.data());
-        });*/
+        //Check if the database already has unlabeled tracks
         try{
             const trackPage = await fetchNewTrackPage();
-            currentTracks.value = trackPage;
+            if(trackPage !== null){
+                isPopulated.value = true;
+                currentTracks.value = trackPage;
+                console.log(trackPage);
+
+            }else{
+                isPopulated.value = false;
+            }
+
+            loadingPop.value = false;
+            
         }catch(e){
-            console.error("Error fetching tracks: ", e);
+            console.error("Error fetching unlabeled tracks: ", e);
+            //#TODO: Show a message to the user
         }
-        
+
     });
 
-    async function fetchNewTrackPage(trackLimit=10, trackOffset=0){
-        const tracksRef = collection(db, "audio_features");
-        const q = query(tracksRef, where("label.mood", "==", ""), orderBy('popularity'), limit(trackLimit), startAfter(trackOffset));
 
-        const querySnapshot = await getDocs(q);
-        if(querySnapshot.size > 0) {
-            let newTracks = [];
-            querySnapshot.forEach((doc) => {
-                let track = {docId: doc.id, ...doc.data()};
-                newTracks.push(track);
-                //currentTracks.value.push(track);
-            });
-            return newTracks;
-            //console.log(currentTracks.value)
-        }else{
-            console.log('No more tracks to label');
-            throw new Error('No more tracks to label')
+    onMounted(async () => {
+
+    });
+
+    async function fetchNewTrackPage() {
+
+        try {
+            const q = query(COLLECTION, where('label.mood', '==', ''), limit(5), orderBy('popularity'));
+            const querySnapshot = await getDocs(q);
+            if (querySnapshot.size > 0) {
+                /*let newTracks = [];
+                querySnapshot.forEach((doc) => {
+                    let track = { docId: doc.id, ...doc.data() };
+                    newTracks.push(track);
+                });*/
+                const newTracks = querySnapshot.docs.map(doc => {
+                    return { docId: doc.id, ...doc.data() };
+                });
+                return newTracks;
+            } else {
+                console.log('No more tracks to label; showing a message to the user.');
+                return null;
+            }
+        } catch (e) {
+            console.error("Error fetching tracks: ", e);
+            return null;
         }
-        
+
     }
 
 
@@ -91,28 +99,58 @@
 
     }
     async function assignMood(docId, mood) {
-        console.log('Assigning mood to track', docId, mood);
-        //Update the track in the database
+        
+        //Push the labeled track to the local array
+        const track = currentTracks.value.find(track => track.docId === docId);
+        track.label.mood = mood;
+        localLabeledTracks.value.push(track);
+        //Remove the track from the currentTracks array
+        currentTracks.value = currentTracks.value.filter(track => track.docId !== docId);
+
+        //Save the labeled track to the database
         const trackRef = doc(db, "audio_features", docId);
         try{
-            await updateDoc(trackRef, { "label.mood": mood });
-            currentTracks.value = currentTracks.value.filter(track => track.docId !== docId);
-            const newTracks = await fetchNewTrackPage(10, 0);
-            currentTracks.value = newTracks;
-
+            await updateDoc(trackRef, {
+                "label.mood": mood
+            });
+            //Remove track from local track array
+            localLabeledTracks.value = localLabeledTracks.value.filter(track => track.docId !== docId);
+            console.log(localLabeledTracks.value);
         }catch(e){
-            console.error("Error updating document: ", e);
+            console.error("Error assigning mood: ", e);
+            userFeedback.value = "Error assigning mood";
+            return false;
         }
-        //Remove the track from the currentTracks array
-        //currentTracks.value = currentTracks.value.filter(track => track.id !== trackId);
-        //Fetch a new page of tracks
-        //await fetchNewTrackPage();
+
+        //If there are no more tracks to label, fetch a new page
+        if(currentTracks.value.length == 0){
+            const newTracks = await fetchNewTrackPage();
+            if(newTracks !== null) {
+                currentTracks.value = newTracks;
+            }else{
+                console.log('No more tracks to label');
+            }
+        }
     }
     
+    async function discardTrack(docId){
+        try{
+            console.log(currentTracks.value);
+            await deleteDoc(doc(db, "audio_features", docId));
+
+            //Remove track from currentTrack
+            currentTracks.value = currentTracks.value.filter(track => track.docId !== docId);
+            console.log("Document successfully deleted!");
+        }catch(e){
+            console.error("Error removing document: ", e);
+            userFeedback.value = "Error removing document";
+        }
+    }
 </script>
 
 <template>
 <div class="container mx-auto h-screen">
+    <div v-if="userFeedback!== false">User feedback</div>
     <div class=" p-4 flex">
         <div class="flex-col w-3/4">
             <h1 class="text-2xl">Maestro: Labeler</h1>
@@ -146,6 +184,7 @@
             :albumName="track.album.name"
             :albumImage="track.album.images[1].url"
             @assignMood="assignMood"
+            @discardTrack="discardTrack"
             />
     </div>
 
