@@ -16,7 +16,7 @@
     const localLabeledTracks = ref([]);
     const userFeedback = ref(false);
 
-    const COLLECTION = collection(db, 'audio_features');
+    
 
     onBeforeMount(async () => {
         //Check if the database already has unlabeled tracks
@@ -48,14 +48,9 @@
     async function fetchNewTrackPage() {
 
         try {
-            const q = query(COLLECTION, where('label.mood', '==', ''), limit(5), orderBy('popularity'));
+            const q = query(collection(db, 'audio_features'), where('label.mood', '==', ''), limit(5), orderBy('popularity'));
             const querySnapshot = await getDocs(q);
             if (querySnapshot.size > 0) {
-                /*let newTracks = [];
-                querySnapshot.forEach((doc) => {
-                    let track = { docId: doc.id, ...doc.data() };
-                    newTracks.push(track);
-                });*/
                 const newTracks = querySnapshot.docs.map(doc => {
                     return { docId: doc.id, ...doc.data() };
                 });
