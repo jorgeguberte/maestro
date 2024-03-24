@@ -149,8 +149,14 @@ router.beforeEach((to, from, next) => {
     case "NewDashboard":
       next();
       break;
+
     case "Labeler":
-      next();
+      if(import.meta.env.MODE === "development"){
+        next();
+      }else{
+        next('/');
+      }
+      
       break;
       
     default:
