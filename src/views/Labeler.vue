@@ -3,14 +3,14 @@
 /*
 * TODO: If there are labeled tracks in the database, but no unlabeled tracks, show a message to the user
 * TODO: When there are no more tracks to label, show a message to the user
-*
-*
+* TODO: Show error message
+* TODO: Standardize string messages
 *
 */
-    import { ref, onBeforeMount, onMounted} from 'vue';
+    import { ref, onBeforeMount, onMounted, computed} from 'vue';
     import TrackCardLabeler from '../components/TrackCardLabeler.vue';
     //Firebase and Firestore
-    import {collection, query, limit, where, addDoc, getDocs, doc, updateDoc, orderBy, deleteDoc} from 'firebase/firestore';
+    import {collection, query, limit, where, addDoc, getDocs, doc, updateDoc, orderBy, deleteDoc, getCountFromServer} from 'firebase/firestore';
     import db from '../helpers/firebase/init.js';
 
 
@@ -22,26 +22,41 @@
     const currentIdx = ref(0);
     const currentTracks = ref([]);
     const localLabeledTracks = ref([]);
-    const userFeedback = ref(false);
 
+    const uiMessages = ref([]);
+
+    const hasUIMessages = computed(()=>{
+        return uiMessages.value.length > 0;
+    })
     
 
     onBeforeMount(async () => {
         //Check if the database already has unlabeled tracks
         try{
             const trackPage = await fetchNewTrackPage();
-            if(trackPage !== null){
+            if(trackPage !== null){// there are tracks to label
                 isPopulated.value = true;
                 currentTracks.value = trackPage;
-            }else{
-                isPopulated.value = false;
+            }else{//No tracks in the page
+                //Check if there are any labeled tracks in the database at all
+                const q = query(collection(db, 'audio_features'), where('label.mood', '!=', ''));
+                const querySnapshot = await getCountFromServer(q);
+                if(querySnapshot.data().count > 0){
+                    isPopulated.value = true;
+                    //There are labeled tracks in the database
+                    uiMessages.value.push("There are labeled tracks in the database, but no more unlabeled tracks. Please check back later.");
+                }else{
+                    //No tracks in the database
+                    isPopulated.value = false;
+                    uiMessages.value.push("No tracks in the database, it's time to populate it.");
+                }
             }
-
             loadingPop.value = false;
             
         }catch(e){
             console.error("Error fetching unlabeled tracks: ", e);
             //#TODO: Show a message to the user
+            uiMessages.value.push("Error fetching tracks. Please try again later.");
         }
 
     });
@@ -62,11 +77,11 @@
                 });
                 return newTracks;
             } else {
-                console.log('No more tracks to label; showing a message to the user.');
                 return null;
             }
         } catch (e) {
             console.error("Error fetching tracks: ", e);
+            uiMessages.value.push("Error fetching tracks. Please try again later.");
             return null;
         }
 
@@ -119,7 +134,8 @@
             console.log(localLabeledTracks.value);
         }catch(e){
             console.error("Error assigning mood: ", e);
-            userFeedback.value = "Error assigning mood";
+            //userFeedback.value = "Error assigning mood";
+            uiMessages.value.push("Error assigning mood.");
             return false;
         }
 
@@ -129,7 +145,7 @@
             if(newTracks !== null) {
                 currentTracks.value = newTracks;
             }else{
-                console.log('No more tracks to label');
+                uiMessages.value.push('No more tracks to label');
             }
         }
     }
@@ -141,26 +157,29 @@
 
             //Remove track from currentTrack
             currentTracks.value = currentTracks.value.filter(track => track.docId !== docId);
-            console.log("Document successfully deleted!");
+            //console.log("Document successfully deleted!");
+            uiMessages.value.push("Track discarded.");
             //If there are no more tracks to label, fetch a new page
             if(currentTracks.value.length == 0){
                 const newTracks = await fetchNewTrackPage();
                 if(newTracks !== null) {
                     currentTracks.value = newTracks;
                 }else{
-                    console.log('No more tracks to label');
+                    uiMessages.value.push('No more tracks to label');
                 }
             }
         }catch(e){
             console.error("Error removing document: ", e);
-            userFeedback.value = "Error removing document";
+            uiMessages.value.push("Error removing track.");
         }
     }
 </script>
 
 <template>
 <div class="container mx-auto h-screen">
-    <div v-if="userFeedback!== false">User feedback</div>
+    <div v-if="hasUIMessages" class="toast toast-top toast-start">
+        
+    </div>
     <div class=" p-4 flex">
         <div class="flex-col w-3/4">
             <h1 class="text-2xl">Maestro: Labeler</h1>
