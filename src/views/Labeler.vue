@@ -1,4 +1,12 @@
 <script setup>
+
+/*
+* TODO: If there are labeled tracks in the database, but no unlabeled tracks, show a message to the user
+* TODO: When there are no more tracks to label, show a message to the user
+*
+*
+*
+*/
     import { ref, onBeforeMount, onMounted} from 'vue';
     import TrackCardLabeler from '../components/TrackCardLabeler.vue';
     //Firebase and Firestore
@@ -25,8 +33,6 @@
             if(trackPage !== null){
                 isPopulated.value = true;
                 currentTracks.value = trackPage;
-                console.log(trackPage);
-
             }else{
                 isPopulated.value = false;
             }
@@ -136,6 +142,15 @@
             //Remove track from currentTrack
             currentTracks.value = currentTracks.value.filter(track => track.docId !== docId);
             console.log("Document successfully deleted!");
+            //If there are no more tracks to label, fetch a new page
+            if(currentTracks.value.length == 0){
+                const newTracks = await fetchNewTrackPage();
+                if(newTracks !== null) {
+                    currentTracks.value = newTracks;
+                }else{
+                    console.log('No more tracks to label');
+                }
+            }
         }catch(e){
             console.error("Error removing document: ", e);
             userFeedback.value = "Error removing document";
